@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.elk.graph.ElkNode;
-
 class DelaunayTriangle extends EdgeArc{
 	public DelaunayTriangle(Edge e1, Edge e2, Edge e3) {
 		edges.add(e1);
@@ -17,14 +15,14 @@ class DelaunayTriangle extends EdgeArc{
 }
 
 class VoronoiCell extends EdgeArc{
-	public final ElkNode elkNode;
-	public VoronoiCell(ElkNode elkNode) {
-		this.elkNode=elkNode;
+	public final Node node;
+	public VoronoiCell(Node node) {
+		this.node=node;
 	}
 }
 
 class EdgeArc{
-	List<Edge> edges = new ArrayList<Edge>();
+	List<Edge> edges = new ArrayList<>();
 	
 	public List<Node> getNodes() {
 		var nodes = new ArrayList<Node>();
@@ -61,14 +59,8 @@ class Edge{
 class Node{
 	public double x = 0;
 	public double y = 0;
-	public final ElkNode elkNode;
 	public final String id;
-	public Node(ElkNode elkNode) {
-		this.elkNode=elkNode;
-		this.id=elkNode.getIdentifier();
-	}
 	public Node(String id) {
-		this.elkNode=null;
 		this.id=id;
 	}
 	public Node() {
@@ -76,23 +68,32 @@ class Node{
 	}
 }
 
+class Graph{
+	public final List<Node> nodes;
+	public final List<Edge> edges;
+	public Graph(List<Node> nodes,List<Edge> edges) {
+		this.nodes=nodes;
+		this.edges=edges;
+	}
+}
 public class LloydStep {
-	public final ElkNode inputGraph;
+	public final Graph inputGraph;
 	public final List<DelaunayTriangle> delaunayTriangles;
-	public final List<VoronoiCell> voronoiCells = new ArrayList<VoronoiCell>();
-	public final Map<DelaunayEdge,VoronoiEdge> delaunayVoronoiEdgeMap = new HashMap<DelaunayEdge,VoronoiEdge>();
+	public final List<VoronoiCell> voronoiCells = new ArrayList<>();
+	public final Map<DelaunayEdge,VoronoiEdge> delaunayVoronoiEdgeMap = new HashMap<>();
 	
-	public LloydStep(ElkNode inputGraph) {
+	public LloydStep(Graph inputGraph) {
 		this.inputGraph=inputGraph;
-		
+
+
 		delaunayTriangles = computeDelaunayTriangulation(inputGraph);
 		
 		//compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
 			//TODO: compute centroids for adjacent triangles / frame crossing if no 2nd triangle
 			//TODO: add edge from adjacent centroids/framecrossings to the following lists:
-			getVoronoiCellForNode(delaunayEdge.from.elkNode).edges.add(null);
-			getVoronoiCellForNode(delaunayEdge.to.elkNode).edges.add(null);
+			getVoronoiCellForNode(delaunayEdge.from).edges.add(null);
+			getVoronoiCellForNode(delaunayEdge.to).edges.add(null);
 		}
 	}
 	
@@ -103,11 +104,11 @@ public class LloydStep {
 		return nodes;
 	}
 	
-	public VoronoiCell getVoronoiCellForNode(ElkNode elkNode) {
+	public VoronoiCell getVoronoiCellForNode(Node node) {
 		for (var cell: voronoiCells)
-			if (cell.elkNode==elkNode) return cell;
+			if (cell.node==node) return cell;
 		 
-		var cell = new VoronoiCell(elkNode);
+		var cell = new VoronoiCell(node);
 		voronoiCells.add(cell);
 		return cell;
 	}
@@ -120,8 +121,8 @@ public class LloydStep {
 		return edges;
 	}
 
-	private List<DelaunayTriangle> computeDelaunayTriangulation(ElkNode inputGraph2) {
-		List<DelaunayTriangle> triangles = new ArrayList<DelaunayTriangle>();
+	private List<DelaunayTriangle> computeDelaunayTriangulation(Graph inputGraph) {
+		List<DelaunayTriangle> triangles = new ArrayList<>();
 		System.out.println("computeDelaunayTriangulation");
 		//TODO: translate this:
 		/*

@@ -1,6 +1,5 @@
 package main;
 
-import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
 
 import algorithm.LloydRelaxation;
@@ -24,5 +23,6 @@ public class Main {
     
     var algorithm = new LloydRelaxation(testGraph);
     algorithm.computeSteps();
+    algorithm.lloydSteps.get(0);
   }
 }
