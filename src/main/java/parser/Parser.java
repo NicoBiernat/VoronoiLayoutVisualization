@@ -21,7 +21,7 @@ public class Parser {
 		while (sc.hasNext()) {
 			line = sc.next();
 			Scanner statement = new Scanner(line);
-			if (statement.hasNext()) {
+			if (line.toString().matches("^\\s*node\\s+(\\S+)\\s*$|^\\s*edge\\s*(\\S+)\\s*->\\s*(\\S+)\\s*$")) {
 				String s = statement.next();
 				switch (s) {
 				case "node":
@@ -30,21 +30,19 @@ public class Parser {
 					break;
 				case "edge":
 					String nodeName1 = statement.next();
-					if (!statement.next().equals("->")) {
-						break;
-					}
+					statement.next();
 					String nodeName2 = statement.next();
-					
+
 					ElkNode node1 = null;
 					ElkNode node2 = null;
-					
+
 					EList<ElkNode> children = graph.getChildren();
 					for (Iterator<ElkNode> i = children.iterator(); i.hasNext();) {
 						ElkNode n = i.next();
 						String ni = n.getIdentifier();
 						if (ni.equals(nodeName1)) {
 							node1 = n;
-						}else if (ni.equals(nodeName2)) {
+						} else if (ni.equals(nodeName2)) {
 							node2 = n;
 						}
 					}
@@ -56,8 +54,18 @@ public class Parser {
 					break;
 				}
 			}
-
 		}
 		return graph;
+	}
+	
+	public static void main(String[] args) {
+		ElkNode test;
+		try {
+			test = parse("TestGraph.Elkt");
+			System.out.println(test.getChildren().toString());
+			System.out.println(test.getContainedEdges().toString());
+		} catch (IOException e) {
+			System.out.println("File not found!");
+		}
 	}
 }
