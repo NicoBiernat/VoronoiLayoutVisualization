@@ -11,7 +11,19 @@ class DelaunayTriangle extends EdgeArc{
 		edges.add(e2);
 		edges.add(e3);
 	}
-	
+	public DelaunayTriangle(Node n1, Node n2, Node n3) {
+		edges.add(new Edge(n1,n2));
+		edges.add(new Edge(n2,n3));
+		edges.add(new Edge(n3,n1));
+	}
+
+	public boolean contains(Node node){
+		return edges.stream().anyMatch(edge->edge.from==node || edge.to == node);
+	}
+
+	public String toString(){
+		return this.getNodes().toString();
+	}
 }
 
 class VoronoiCell extends EdgeArc{
@@ -55,6 +67,15 @@ class Edge{
 		this.from=from;
 		this.to=to;
 	}
+	public String toString(){
+		return from.id +" -> "+to.id;
+	}
+	public boolean equals(Edge edge, boolean directed){
+		if (directed){
+			return this.from==edge.from && this.to== edge.to;
+		}
+		return this.from==edge.from && this.to== edge.to || this.from==edge.to && this.to== edge.from ;
+	}
 }
 class Node{
 	public double x = 0;
@@ -63,8 +84,20 @@ class Node{
 	public Node(String id) {
 		this.id=id;
 	}
+	public Node(double x, double y) {
+		this("",x,y);
+	}
+	public Node(String id,double x,double y) {
+		this(id);
+		this.x=x;
+		this.y=y;
+	}
 	public Node() {
 		this("");
+	}
+
+	public String toString(){
+		return id;//"("+id+": "+x+", "+y+")";
 	}
 }
 
@@ -74,6 +107,9 @@ class Graph{
 	public Graph(List<Node> nodes,List<Edge> edges) {
 		this.nodes=nodes;
 		this.edges=edges;
+	}
+	public String toString(){
+		return nodes.toString()+"\n"+edges.toString();
 	}
 }
 public class LloydStep {
@@ -85,9 +121,12 @@ public class LloydStep {
 	public LloydStep(Graph inputGraph) {
 		this.inputGraph=inputGraph;
 
+		System.out.println("LloydStep");
+		System.out.println(inputGraph);
 
-		delaunayTriangles = computeDelaunayTriangulation(inputGraph);
-		
+		delaunayTriangles = computeDelaunayTriangulation(inputGraph.nodes);
+
+		System.out.println(delaunayTriangles);
 		//compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
 			//TODO: compute centroids for adjacent triangles / frame crossing if no 2nd triangle
@@ -121,58 +160,60 @@ public class LloydStep {
 		return edges;
 	}
 
-	private List<DelaunayTriangle> computeDelaunayTriangulation(Graph inputGraph) {
-		List<DelaunayTriangle> triangles = new ArrayList<>();
-		System.out.println("computeDelaunayTriangulation");
-		//TODO: translate this:
-		/*
-		 * 	function triangulate(vertices: Vertice[]): Triangle[] {
-		        const objEqual = (a: any[], b: any[]) => JSON.stringify(a.sort((c, d) => c.x - d.x)) == JSON.stringify(b.sort((c, d) => c.x - d.x));
-		
-		        let triangleList: Triangle[] = [];
-		        const superTriangle: Triangle = [{ x: 25, y: 25 }, { x: 1000, y: 25 }, { x: 25, y: 1000 }];
-		        triangleList.push(superTriangle);
-		        //idk why removeing this doesnt make any difference
-		        //superTriangle.forEach((v, i) => vertices.push({ ...v, id: "st" + i }));
-		        vertices.forEach(samplePoint => {
-		            let edgeBuffer: [{ x: number, y: number }, { x: number, y: number }][] = [];
-		            triangleList.forEach(triangle => {
-		                // calculate the triangle circumcircle center and radius
-		                //const d = (a, b) => Math.sqrt((a.x - b.x) ** 2 + (a.y + b.y) ** 2);
-		                //const [a, b, c] = [d(triangle[0], triangle[1]), d(triangle[1], triangle[2]), d(triangle[2], triangle[0])];
-		                //const s = (a + b + c) / 2;
-		                //const circumRadius = (a * b * c) / (4 * Math.sqrt(s * (s - a) * (s - b) * (s - c)))
-		
-		                //source: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
-		                const [A, B, C] = triangle;
-		                const [B_, C_] = [{ x: B.x - A.x, y: B.y - A.y }, { x: C.x - A.x, y: C.y - A.y }];
-		                const D_ = 2 * (B_.x * C_.y - B_.y * C_.x)
-		                const Ux_ = 1 / D_ * (C_.y * (B_.x ** 2 + B_.y ** 2) - B_.y * (C_.x ** 2 + C_.y ** 2))
-		                const Uy_ = -1 / D_ * (C_.x * (B_.x ** 2 + B_.y ** 2) - B_.x * (C_.x ** 2 + C_.y ** 2))
-		                const circumCenter = { x: Ux_ + A.x, y: Uy_ + A.y };
-		                const circumRadius = Math.sqrt(Ux_ ** 2 + Uy_ ** 2);
-		
-		                // if the point lies in the triangle circumcircle then
-		                if ((samplePoint.x - circumCenter.x) ** 2 + (samplePoint.y - circumCenter.y) ** 2 < circumRadius ** 2) {
-		                    edgeBuffer.push([triangle[0], triangle[1]]);
-		                    edgeBuffer.push([triangle[1], triangle[2]]);
-		                    edgeBuffer.push([triangle[2], triangle[0]]);
-		
-		                    triangleList = triangleList.filter(t => !objEqual(t, triangle));
-		                }
-		            })
-		            //delete all doubly specified edges from the edge buffer
-		            edgeBuffer = edgeBuffer.filter((edge, _, arr) => arr.filter(e => objEqual(e, edge)).length == 1);
-		            //this leaves the edges of the enclosing polygon only
-		
-		            edgeBuffer.forEach(edge => {
-		                triangleList.push([edge[0], edge[1], samplePoint])
-		            })
-		        })
-		        //     remove any triangles from the triangle list that use the supertriangle vertices
-		        return triangleList.filter(t => !t.some(vertex => superTriangle.some(v => objEqual([vertex], [v]))));
-		    }
-		 */
+	private List<DelaunayTriangle> computeDelaunayTriangulation(List<Node> inputNodes) {
+
+		List<DelaunayTriangle> triangleList = new ArrayList<>();
+
+		//create copy of input nodes
+		List<Node> nodes = new ArrayList<>(inputNodes);
+
+		//construct triangle containing all input nodes
+		var maxX = inputNodes.stream().mapToDouble(node -> node.x).max().orElse(0)+10;
+		var maxY = inputNodes.stream().mapToDouble(node -> node.y).max().orElse(0)+10;
+		var minX = inputNodes.stream().mapToDouble(node -> node.x).min().orElse(0)-10;
+		var minY = inputNodes.stream().mapToDouble(node -> node.y).min().orElse(0)-10;
+		var superTriangle = new DelaunayTriangle(new Node("s1",minX,minY), new Node("s2",maxX*2, minY), new Node("s3",minX,maxY*2));
+		triangleList.add(superTriangle);
+
+		//source: http://paulbourke.net/papers/triangulate/
+		for (var samplePoint: nodes){
+			var trianglesToBeRemoved = new ArrayList<DelaunayTriangle>();
+			var edgeBuffer = new ArrayList<Edge>();
+			for (var triangle: triangleList){
+				//source: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+				var triNodes= triangle.getNodes();
+				var A = triNodes.get(0);
+				var B = triNodes.get(1);
+				var C = triNodes.get(2);
+				var B_ = new Node(B.x - A.x, B.y - A.y);
+				var C_ = new Node(C.x - A.x, C.y - A.y );
+				var D_ = 2 * (B_.x * C_.y - B_.y * C_.x);
+				var Ux_ = 1 / D_ * (C_.y * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.y * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
+				var Uy_ = -1 / D_ * (C_.x * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.x * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
+				var circumCenter = new Node( Ux_ + A.x, Uy_ + A.y);
+				var circumRadius = Math.sqrt(Math.pow(Ux_,2) + Math.pow(Uy_,2));
+
+				// if the point lies in the triangle circumCircle then
+				if (Math.pow(samplePoint.x - circumCenter.x,2) +  Math.pow(samplePoint.y -circumCenter.y,2) < Math.pow(circumRadius,2)) {
+					edgeBuffer.addAll(triangle.edges);
+					trianglesToBeRemoved.add(triangle);
+				}
+			}
+			triangleList.removeAll(trianglesToBeRemoved);
+			//delete all doubly specified edges from the edge buffer
+			edgeBuffer.removeIf(edge -> edgeBuffer.stream().filter(e->e.equals(edge,false)).limit(2).count() == 2);
+			//this leaves the edges of the enclosing polygon only
+
+			for (var edge : edgeBuffer){
+				triangleList.add(new DelaunayTriangle(edge.from, edge.to, samplePoint));
+			}
+		}
+
+		//remove any triangles from the triangle list that use the superTriangle nodes
+		var triangles = new ArrayList<DelaunayTriangle>();
+		for (var triangle: triangleList)
+			if (superTriangle.getNodes().stream().noneMatch(triangle::contains))
+				triangles.add(triangle);
 		return triangles;
 	}
 }
