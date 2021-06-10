@@ -1,118 +1,214 @@
 package algorithm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-class DelaunayTriangle extends EdgeArc{
-	public DelaunayTriangle(Edge e1, Edge e2, Edge e3) {
-		edges.add(e1);
-		edges.add(e2);
-		edges.add(e3);
-	}
-	public DelaunayTriangle(Node n1, Node n2, Node n3) {
-		edges.add(new Edge(n1,n2));
-		edges.add(new Edge(n2,n3));
-		edges.add(new Edge(n3,n1));
-	}
-
-	public boolean contains(Node node){
-		return edges.stream().anyMatch(edge->edge.from==node || edge.to == node);
-	}
-
-	public String toString(){
-		return this.getNodes().toString();
-	}
-}
-
-class VoronoiCell extends EdgeArc{
-	public final Node node;
-	public VoronoiCell(Node node) {
-		this.node=node;
-	}
-}
-
-class EdgeArc{
-	List<Edge> edges = new ArrayList<>();
-	
-	public List<Node> getNodes() {
-		var nodes = new ArrayList<Node>();
-		for (var edge: edges) {
-			if (!nodes.contains(edge.from)) nodes.add(edge.from);
-			if (!nodes.contains(edge.to)) nodes.add(edge.to);
-		}
-		return nodes;
-	}
-	public Node getCentroid() {
-		// TODO: to be implemented
-		return null;
-	}
-}
-
-class DelaunayEdge extends Edge{
-	public DelaunayEdge(Node from, Node to) {
-		super(from, to);
-	}
-}
-class VoronoiEdge extends Edge{
-	public VoronoiEdge(Node from, Node to) {
-		super(from, to);
-	}
-}
-class Edge{	
-	public Node from;
-	public final Node to;
-	public Edge(Node from, Node to) {
-		this.from=from;
-		this.to=to;
-	}
-	public String toString(){
-		return from.id +" -> "+to.id;
-	}
-	public boolean equals(Edge edge, boolean directed){
-		if (directed){
-			return this.from==edge.from && this.to== edge.to;
-		}
-		return this.from==edge.from && this.to== edge.to || this.from==edge.to && this.to== edge.from ;
-	}
-}
-class Node{
-	public double x = 0;
-	public double y = 0;
-	public final String id;
-	public Node(String id) {
-		this.id=id;
-	}
-	public Node(double x, double y) {
-		this("",x,y);
-	}
-	public Node(String id,double x,double y) {
-		this(id);
-		this.x=x;
-		this.y=y;
-	}
-	public Node() {
-		this("");
-	}
-
-	public String toString(){
-		return id;//"("+id+": "+x+", "+y+")";
-	}
-}
-
-class Graph{
-	public final List<Node> nodes;
-	public final List<Edge> edges;
-	public Graph(List<Node> nodes,List<Edge> edges) {
-		this.nodes=nodes;
-		this.edges=edges;
-	}
-	public String toString(){
-		return nodes.toString()+"\n"+edges.toString();
-	}
-}
 public class LloydStep {
+
+	public static class DelaunayTriangle extends EdgeArc{
+		public DelaunayTriangle(Edge e1, Edge e2, Edge e3) {
+			edges.add(e1);
+			edges.add(e2);
+			edges.add(e3);
+		}
+		public DelaunayTriangle(Node n1, Node n2, Node n3) {
+			edges.add(new Edge(n1,n2));
+			edges.add(new Edge(n2,n3));
+			edges.add(new Edge(n3,n1));
+		}
+
+		public boolean contains(Node node){
+			return edges.stream().anyMatch(edge->edge.from==node || edge.to == node);
+		}
+
+		public String toString(){
+			return this.getNodes().toString();
+		}
+
+		private Circle circumCircle;
+		public Circle getCircumCircle() {
+			if (circumCircle!=null) return circumCircle;
+			//source: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+			var triNodes= this.getNodes();
+			var A = triNodes.get(0);
+			var B = triNodes.get(1);
+			var C = triNodes.get(2);
+			var B_ = new Node(B.x - A.x, B.y - A.y);
+			var C_ = new Node(C.x - A.x, C.y - A.y );
+			var D_ = 2 * (B_.x * C_.y - B_.y * C_.x);
+			var Ux_ = 1 / D_ * (C_.y * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.y * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
+			var Uy_ = -1 / D_ * (C_.x * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.x * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
+			var circumCenter = new Node(this.toString(), Ux_ + A.x, Uy_ + A.y);
+			var circumRadius = Math.sqrt(Math.pow(Ux_,2) + Math.pow(Uy_,2));
+			circumCircle=new Circle(circumCenter,circumRadius);
+			return circumCircle;
+		}
+		public static class Circle{
+			public final Node center;
+			public final double radius;
+			public Circle(Node center,double radius){
+				this.center=center;
+				this.radius=radius;
+			}
+		}
+	}
+
+	public static class VoronoiCell extends EdgeArc{
+		public final Node node;
+		public VoronoiCell(Node node) {
+			this.node=node;
+		}
+	}
+
+	public static class EdgeArc{
+		public List<Edge> edges = new ArrayList<>();
+
+		public List<Node> getNodes() {
+			var nodes = new ArrayList<Node>();
+			for (var edge: edges) {
+				if (!nodes.contains(edge.from)) nodes.add(edge.from);
+				if (!nodes.contains(edge.to)) nodes.add(edge.to);
+			}
+			return nodes;
+		}
+		private List<Node> findAdjacent(Node node){
+			var adjacentEdges = this.edges.stream().filter(edge -> edge.to==node ||edge.from == node).collect(Collectors.toList());
+			var nodes = new ArrayList<Node>();
+			for (var edge : adjacentEdges){
+				if (!nodes.contains(edge.to) && edge.to!=node)nodes.add(edge.to);
+				if (!nodes.contains(edge.from) && edge.from!=node)nodes.add(edge.from);
+			}
+			return nodes;
+		}
+		public List<Node> getNodesInOrder(){
+			var ends = new ArrayList<Node>();
+			var inputNodes = getNodes();
+			for (var node: inputNodes)
+				if (findAdjacent(node).size()==1)
+					ends.add(node);
+			var nodesInOrder=new ArrayList<Node>();
+			Node lastNode=null;
+			Node currentNode;
+			if (ends.size()>0)
+				currentNode=ends.get(0);
+			else
+				currentNode= inputNodes.get(0);
+
+			while(nodesInOrder.size()<inputNodes.size()) {
+				Optional<Edge> currentEdge;
+				nodesInOrder.add(currentNode);
+				var adjacent = findAdjacent(currentNode).stream().filter(node->!nodesInOrder.contains(node)).collect(Collectors.toList());
+				if (adjacent.size()==0)
+					break;
+				currentNode=adjacent.get(0);
+			}
+
+
+			return nodesInOrder;
+		}
+		private Node centroid;
+		public Node getCentroid() {
+			//cache result so obj equality holds
+			if (centroid!=null) return centroid;
+			//source: https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/
+			double x=0,y=0;
+			double signedArea = 0;
+			var v = getNodesInOrder();
+			double ansX=0,ansY=0;
+			// For all vertices
+			for (int i = 0; i < v.size(); i++) {
+				double x0 = v.get(i).x, y0 = v.get(i).y;
+				double x1 = v.get((i + 1) % v.size()).x, y1 = v.get((i + 1) % v.size()).y;
+				// Calculate value of A
+				// using shoelace formula
+				double A = (x0 * y1) - (x1 * y0);
+				signedArea += A;
+				// Calculating coordinates of
+				// centroid of polygon
+				ansX += (x0 + x1) * A;
+				ansY += (y0 + y1) * A;
+			}
+			signedArea *= 0.5;
+			ansX = (ansX) / (6 * signedArea);
+			ansY = (ansY) / (6 * signedArea);
+			centroid=new Node(ansX,ansY);
+			return centroid;
+		}
+		public Node getNodesCentroid() {
+			double ansX=0,ansY=0;
+			var v = getNodes();
+			for (var node:v){
+				ansX+=node.x;
+				ansY+=node.y;
+			}
+			return new Node(ansX/v.size(),ansY/v.size());
+		}
+	}
+
+	public static class DelaunayEdge extends Edge{
+		public DelaunayEdge(Node from, Node to) {
+			super(from, to);
+		}
+	}
+	public static class VoronoiEdge extends Edge{
+		public VoronoiEdge(Node from, Node to) {
+			super(from, to);
+		}
+	}
+	public static class Edge{
+		public Node from;
+		public final Node to;
+		public Edge(Node from, Node to) {
+			this.from=from;
+			this.to=to;
+		}
+		public String toString(){
+			return from.id +" -> "+to.id;
+		}
+		public boolean equals(Edge edge, boolean directed){
+			if (directed){
+				return this.from==edge.from && this.to== edge.to;
+			}
+			return this.from==edge.from && this.to== edge.to || this.from==edge.to && this.to== edge.from ;
+		}
+	}
+	public static class Node{
+		public double x = 0;
+		public double y = 0;
+		public final String id;
+		public Node(String id) {
+			this.id=id;
+		}
+		public Node(double x, double y) {
+			this("",x,y);
+		}
+		public Node(String id,double x,double y) {
+			this(id);
+			this.x=x;
+			this.y=y;
+		}
+		public Node() {
+			this("");
+		}
+
+		public String toString(){
+			return id;//"("+id+": "+x+", "+y+")";
+		}
+	}
+
+	public static class Graph{
+		public final List<Node> nodes;
+		public final List<Edge> edges;
+
+		public Graph(List<Node> nodes,List<Edge> edges) {
+			this.nodes=nodes;
+			this.edges=edges;
+		}
+		public String toString(){
+			return nodes.toString()+"\n"+edges.toString();
+		}
+	}
+
 	public final Graph inputGraph;
 	public final List<DelaunayTriangle> delaunayTriangles;
 	public final List<VoronoiCell> voronoiCells = new ArrayList<>();
@@ -121,18 +217,40 @@ public class LloydStep {
 	public LloydStep(Graph inputGraph) {
 		this.inputGraph=inputGraph;
 
-		System.out.println("LloydStep");
-		System.out.println(inputGraph);
-
 		delaunayTriangles = computeDelaunayTriangulation(inputGraph.nodes);
 
-		System.out.println(delaunayTriangles);
 		//compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
-			//TODO: compute centroids for adjacent triangles / frame crossing if no 2nd triangle
-			//TODO: add edge from adjacent centroids/framecrossings to the following lists:
-			getVoronoiCellForNode(delaunayEdge.from).edges.add(null);
-			getVoronoiCellForNode(delaunayEdge.to).edges.add(null);
+			var adjacentTriangles = new ArrayList<DelaunayTriangle>();
+			for (var triangle: delaunayTriangles)
+				if (triangle.edges.stream().anyMatch(e->e.equals(delaunayEdge,false)))
+					adjacentTriangles.add(triangle);
+			if (adjacentTriangles.size()==2) {
+				//simple case 2 adjacent triangles add line from adjacent circumCenters
+				var voronoiEdge = new Edge(adjacentTriangles.get(0).getCircumCircle().center,adjacentTriangles.get(1).getCircumCircle().center);
+				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
+				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
+			}else if (adjacentTriangles.size()==1) {
+				var circumCenter = adjacentTriangles.get(0).getCircumCircle().center;
+
+				var dx = delaunayEdge.from.x-delaunayEdge.to.x;
+				var dy = delaunayEdge.from.y-delaunayEdge.to.y;
+
+				//normalize and scale by 10
+				var len=Math.sqrt(dx*dx+dy*dy);
+				dx*=100/len;
+				dy*=100/len;
+
+				//add rotated by 90° to other point
+				var frameCrossing = new Node("F"+circumCenter.toString(),circumCenter.x-dy ,circumCenter.y+dx);
+				//TODO: dont just add 100 units in that direction, instead calculate crossing with frame and set point accrodingly
+				var voronoiEdge = new Edge(circumCenter,frameCrossing);
+				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
+				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
+			}else{
+				throw new IllegalStateException("Delaunay Edge "+delaunayEdge+" has "+adjacentTriangles.size()+" triangles: "+adjacentTriangles);
+			}
+
 		}
 	}
 	
@@ -156,7 +274,7 @@ public class LloydStep {
 		var edges = new ArrayList<Edge>();
 		for (var triangle: delaunayTriangles) 
 			for (var edge: triangle.edges) 
-				if (!edges.contains(edge)) edges.add(edge);
+				if (edges.stream().noneMatch(e->e.equals(edge,false))) edges.add(edge);
 		return edges;
 	}
 
@@ -180,21 +298,9 @@ public class LloydStep {
 			var trianglesToBeRemoved = new ArrayList<DelaunayTriangle>();
 			var edgeBuffer = new ArrayList<Edge>();
 			for (var triangle: triangleList){
-				//source: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
-				var triNodes= triangle.getNodes();
-				var A = triNodes.get(0);
-				var B = triNodes.get(1);
-				var C = triNodes.get(2);
-				var B_ = new Node(B.x - A.x, B.y - A.y);
-				var C_ = new Node(C.x - A.x, C.y - A.y );
-				var D_ = 2 * (B_.x * C_.y - B_.y * C_.x);
-				var Ux_ = 1 / D_ * (C_.y * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.y * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
-				var Uy_ = -1 / D_ * (C_.x * (Math.pow(B_.x,2) + Math.pow(B_.y,2)) - B_.x * (Math.pow(C_.x,2) + Math.pow(C_.y,2)));
-				var circumCenter = new Node( Ux_ + A.x, Uy_ + A.y);
-				var circumRadius = Math.sqrt(Math.pow(Ux_,2) + Math.pow(Uy_,2));
-
+				var circumCircle= triangle.getCircumCircle();
 				// if the point lies in the triangle circumCircle then
-				if (Math.pow(samplePoint.x - circumCenter.x,2) +  Math.pow(samplePoint.y -circumCenter.y,2) < Math.pow(circumRadius,2)) {
+				if (Math.pow(samplePoint.x - circumCircle.center.x,2) +  Math.pow(samplePoint.y -circumCircle.center.y,2) < Math.pow(circumCircle.radius,2)) {
 					edgeBuffer.addAll(triangle.edges);
 					trianglesToBeRemoved.add(triangle);
 				}
@@ -208,7 +314,6 @@ public class LloydStep {
 				triangleList.add(new DelaunayTriangle(edge.from, edge.to, samplePoint));
 			}
 		}
-
 		//remove any triangles from the triangle list that use the superTriangle nodes
 		var triangles = new ArrayList<DelaunayTriangle>();
 		for (var triangle: triangleList)
