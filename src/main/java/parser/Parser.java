@@ -1,6 +1,7 @@
 package parser;
 
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Scanner;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,7 +13,9 @@ import org.eclipse.emf.common.util.EList;
 public class Parser {
 
 	public static ElkNode parse(String file) throws IOException {
+		Random rnd = new Random();
 		ElkNode graph = ElkGraphUtil.createGraph();
+		graph.setIdentifier("root");
 		FileReader datei = new FileReader(file);
 
 		String line = "";
@@ -27,6 +30,8 @@ public class Parser {
 				case "node":
 					ElkNode node = ElkGraphUtil.createNode(graph);
 					node.setIdentifier(statement.next());
+				      node.setX(rnd.nextInt(100)+30);
+				      node.setY(rnd.nextInt(100)+30);
 					break;
 				case "edge":
 					String nodeName1 = statement.next();

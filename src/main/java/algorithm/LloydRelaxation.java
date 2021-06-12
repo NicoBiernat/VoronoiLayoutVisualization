@@ -7,30 +7,62 @@ import java.util.Map;
 
 import org.eclipse.elk.graph.ElkNode;
 
+import algorithm.LloydStep.Edge;
+import algorithm.LloydStep.Graph;
+import algorithm.LloydStep.Node;
+
 public class LloydRelaxation {
+	private static final double MAX_DISTANCE = 2;
 	public final ElkNode inputGraph;
 	public final LloydStep.Graph transformedGraph;
-	public final Map<ElkNode,LloydStep.Node> transformationMap;
-	public final List<LloydStep> lloydSteps=new ArrayList<>();
-	
+	public final Map<ElkNode, LloydStep.Node> transformationMap;
+	public final List<LloydStep> lloydSteps = new ArrayList<>();
+
 	public LloydRelaxation(ElkNode inputGraph) {
-		this.inputGraph=inputGraph;
+		this.inputGraph = inputGraph;
 		List<LloydStep.Edge> edges = new ArrayList<>();
 		List<LloydStep.Node> nodes = new ArrayList<>();
 		transformationMap = new HashMap<>();
 		for (var elkNode : inputGraph.getChildren()) {
 			var node = new LloydStep.Node(elkNode.getIdentifier(), elkNode.getX(), elkNode.getY());
-			transformationMap.put(elkNode,node);
+			transformationMap.put(elkNode, node);
 			nodes.add(node);
 		}
 		for (var edge : inputGraph.getContainedEdges())
-			edges.add(new LloydStep.Edge(transformationMap.get((ElkNode)edge.getSources().get(0)),transformationMap.get((ElkNode)edge.getTargets().get(0))));
-		this.transformedGraph = new LloydStep.Graph(nodes,edges);
+			edges.add(new LloydStep.Edge(transformationMap.get((ElkNode) edge.getSources().get(0)),
+					transformationMap.get((ElkNode) edge.getTargets().get(0))));
+		this.transformedGraph = new LloydStep.Graph(nodes, edges);
 	}
 
+	private boolean distance(Node a, Node b) {
+		return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) > MAX_DISTANCE;
+	}
+	
 	public void computeSteps() {
+
+		ArrayList<Edge> edges = new ArrayList<>();
+		for (Edge e : transformedGraph.edges) {
+			edges.add(new Edge(e.from, e.to));
+		}
+
 		lloydSteps.add(new LloydStep(transformedGraph));
-		//TODO: to be implemented
+		
+		Boolean end = true;
+		int i = 0;
+		while (end) {
+			LloydStep last = lloydSteps.get(i);
+			ArrayList<Node> nodes = new ArrayList<>();
+
+			for (Node n : last.inputGraph.nodes) {
+				Node centroid = last.getVoronoiCellForNode(n).getCentroid();
+				end = distance(n, centroid);
+				nodes.add(new Node(n.id, centroid.x, centroid.y));
+			}
+
+			lloydSteps.add(new LloydStep(new Graph(nodes, edges)));
+			i++;
+		}
+		System.out.println("Steps: " + i);
 	}
 
 }

@@ -1,6 +1,8 @@
 package view;
 
 import algorithm.LloydRelaxation;
+import parser.Parser;
+
 import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
 
@@ -8,10 +10,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.io.IOException;
 import java.util.Random;
 
 public class MainView extends JFrame {
-  public MainView() {
+  private static final String FILE_NAME = "testGraph.elkt";
+
+public MainView() throws IOException {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
@@ -29,7 +34,9 @@ public class MainView extends JFrame {
     add(header, BorderLayout.NORTH);
 
 
-    var testGraph = generateRandomGraph(20, 0, new Random(1));
+    //var testGraph = generateRandomGraph(20, 0, new Random(1));
+    //Es werden random edges erstellt. Nicht sicher wo/warum.
+    var testGraph = Parser.parse(FILE_NAME);
 
     var algorithm = new LloydRelaxation(testGraph);
     algorithm.computeSteps();
