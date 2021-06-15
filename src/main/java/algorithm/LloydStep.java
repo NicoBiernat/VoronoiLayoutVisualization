@@ -99,8 +99,11 @@ public class LloydStep {
 		public List<Node> getNodesInOrder() {
 			var ends = new ArrayList<Node>();
 			var inputNodes = getNodes();
-			for (var node : inputNodes)
-				if (findAdjacent(node).size() == 1)
+			if (inputNodes.size() == 0) {
+				return ends;
+			}
+			for (var node: inputNodes)
+				if (findAdjacent(node).size()==1)
 					ends.add(node);
 			var nodesInOrder = new ArrayList<Node>();
 			Node lastNode = null;

@@ -5,17 +5,17 @@ node n3
 node n4
 node n5
 node n6
-node n7
-node n8
-node n9
-node n10
-node n11
-node n12
-node n13
-node n14
-node n15
-node n16
-node n17
-node n18
-node n19
-node n20
+
+edge n1 -> n2
+edge n2 -> n3
+edge n3 -> n4
+edge n4 -> n5
+edge n5 -> n6
+edge n6 -> n1
+
+edge n0 -> n1
+edge n0 -> n2
+edge n0 -> n3
+edge n0 -> n4
+edge n0 -> n5
+edge n0 -> n6
