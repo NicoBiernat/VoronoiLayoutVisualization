@@ -7,6 +7,7 @@ import java.awt.*;
 
 public class Canvas extends JPanel {
   int SCALING_CONST = 1;
+  int OFFSET_CONST = 20;
 
   private LloydStep lloydStep;
   private LloydStep.Graph inputGraph;
@@ -42,9 +43,9 @@ public class Canvas extends JPanel {
   private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {
     for (var node : graph.nodes) {
       g2d.setColor(Color.RED);
-      g2d.fillOval((int) node.x * SCALING_CONST - 5, (int) node.y * SCALING_CONST - 5, 10, 10);
+      g2d.fillOval((int) node.x * SCALING_CONST - 5+OFFSET_CONST, (int) node.y * SCALING_CONST - 5+OFFSET_CONST, 10, 10);
       g2d.setColor(Color.BLACK);
-      g2d.drawString(node.id, (int) node.x * SCALING_CONST - 5, (int) node.y * SCALING_CONST - 5);
+      g2d.drawString(node.id, (int) node.x * SCALING_CONST - 5+OFFSET_CONST, (int) node.y * SCALING_CONST - 5+OFFSET_CONST);
 //      System.out.println("Drawing " + node.id + " at (" + ((int) node.x * SCALING_CONST - 5) + ", " + ((int) node.y * SCALING_CONST - 5) + ")");
     }
   }
@@ -52,7 +53,7 @@ public class Canvas extends JPanel {
   private void drawEdges(Graphics2D g2d, LloydStep.Graph graph) {
     for (var edge : graph.edges) {
       g2d.setColor(Color.BLACK);
-      g2d.drawLine((int) edge.from.x * SCALING_CONST, (int) edge.from.y * SCALING_CONST, (int) edge.to.x * SCALING_CONST, (int) edge.to.y * SCALING_CONST);
+      g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
     }
   }
 
@@ -60,7 +61,7 @@ public class Canvas extends JPanel {
     for (var triangle : lloydStep.delaunayTriangles) {
       for (var edge : triangle.edges) {
         g2d.setColor(Color.ORANGE);
-        g2d.drawLine((int) edge.from.x * SCALING_CONST, (int) edge.from.y * SCALING_CONST, (int) edge.to.x * SCALING_CONST, (int) edge.to.y * SCALING_CONST);
+        g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
       }
           /*var centroid = triangle.getNodesCentroid();
           g2d.setColor(Color.BLUE);
@@ -73,9 +74,9 @@ public class Canvas extends JPanel {
     for (var triangle : lloydStep.delaunayTriangles) {
       var centroid = triangle.getCircumCircle().center;
       g2d.setColor(Color.BLUE);
-      g2d.fillOval((int) centroid.x * SCALING_CONST - 5, (int) centroid.y * SCALING_CONST - 5, 10, 10);
+      g2d.fillOval((int) centroid.x * SCALING_CONST - 5+OFFSET_CONST, (int) centroid.y * SCALING_CONST - 5+OFFSET_CONST, 10, 10);
       g2d.setColor(Color.BLACK);
-      g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) centroid.x * SCALING_CONST - 5, (int) centroid.y * SCALING_CONST - 5);
+      g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) centroid.x * SCALING_CONST - 5+OFFSET_CONST, (int) centroid.y * SCALING_CONST - 5+OFFSET_CONST);
     }
   }
 
@@ -83,14 +84,14 @@ public class Canvas extends JPanel {
     for (var cell : lloydStep.voronoiCells) {
       for (var edge : cell.edges) {
         g2d.setColor(Color.BLUE);
-        g2d.drawLine((int) edge.from.x * SCALING_CONST, (int) edge.from.y * SCALING_CONST, (int) edge.to.x * SCALING_CONST, (int) edge.to.y * SCALING_CONST);
+        g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
       }
       var centroid = cell.getNodesCentroid();
           /*g2d.setColor(Color.GREEN);
           g2d.fillOval((int)centroid.x*SCALING_CONST-6, (int)centroid.y*SCALING_CONST-7,14,14);
           centroid = cell.getCentroid();*/
       g2d.setColor(Color.CYAN);
-      g2d.fillOval((int) centroid.x * SCALING_CONST - 5, (int) centroid.y * SCALING_CONST - 7, 14, 14);
+      g2d.fillOval((int) centroid.x * SCALING_CONST - 5+OFFSET_CONST, (int) centroid.y * SCALING_CONST - 7+OFFSET_CONST, 14, 14);
     }
   }
 
