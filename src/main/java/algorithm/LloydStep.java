@@ -244,8 +244,9 @@ public class LloydStep {
 		}
 	}
 
-	private static final double WIDTH = 200;
-	private static final double HIGHT = 200;
+
+	private static final double WIDTH = 500;
+	private static final double HEIGHT = 500;
 
 	public final Graph inputGraph;
 	public final List<DelaunayTriangle> delaunayTriangles;
@@ -290,7 +291,7 @@ public class LloydStep {
 				}
 				
 				if (dy > 0) {
-					y = (HIGHT - circumCenter.y) / dy;
+					y = (HEIGHT - circumCenter.y) / dy;
 				} else {
 					y = -(circumCenter.y / dy);
 				}
@@ -304,6 +305,7 @@ public class LloydStep {
 				}
 
 				var frameCrossing = new Node("F" + circumCenter.toString(), circumCenter.x + dx, circumCenter.y + dy);
+				System.out.println(frameCrossing);
 				var voronoiEdge = new Edge(circumCenter, frameCrossing);
 				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
 				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
@@ -311,7 +313,40 @@ public class LloydStep {
 				throw new IllegalStateException("Delaunay Edge " + delaunayEdge + " has " + adjacentTriangles.size()
 						+ " triangles: " + adjacentTriangles);
 			}
+		}
+		//close open voronoi cells, that have been clipped
+		for (var cell : voronoiCells){
+			var nodes = cell.getNodesInOrder();
+			var start = nodes.get(0);
+			var end = nodes.get(nodes.size()-1);
+			if (cell.edges.stream().anyMatch(edge -> edge.from==start && edge.to == end || edge.from==end && edge.to == start)){
+				//closed loop nothing to be done
+			}else if (Math.abs(start.x-end.x)<0.01 || Math.abs(start.y-end.y)<0.01){
+				//start and end on one axis
+				cell.edges.add(new Edge(start,end));
+			}else{
+				//assuming only one edge crossing, TODO: handle multiple edge crossings
 
+				var tl=new Node("tl",0,0);
+				var tr=new Node("bl",WIDTH,0);
+				var bl=new Node("tl",0, HEIGHT);
+				var br=new Node("bl",WIDTH, HEIGHT);
+				Node corner = null;
+
+				if (Math.abs(start.x)<0.01 || Math.abs(end.x)<0.01) //left side
+					if (Math.abs(start.y)<0.01 || Math.abs(end.y)<0.01) //top side
+						corner=tl;
+					else //bottom side
+						corner=bl;
+				else //right side
+					if (Math.abs(start.y)<0.01 || Math.abs(end.y)<0.01) //top side
+						corner=tr;
+					else //bottom side
+						corner=br;
+
+				cell.edges.add(new Edge(start,corner));
+				cell.edges.add(new Edge(corner,end));
+			}
 		}
 	}
 

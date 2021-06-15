@@ -12,7 +12,7 @@ import algorithm.LloydStep.Graph;
 import algorithm.LloydStep.Node;
 
 public class LloydRelaxation {
-	private static final double MAX_DISTANCE = 2;
+	private static final double MAX_DISTANCE = 0.01;
 	public final ElkNode inputGraph;
 	public final LloydStep.Graph transformedGraph;
 	public final Map<ElkNode, LloydStep.Node> transformationMap;
