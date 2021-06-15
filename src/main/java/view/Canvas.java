@@ -13,10 +13,14 @@ public class Canvas extends JPanel {
 
   public void update(LloydStep lloydStep) {
     this.lloydStep = lloydStep;
+    this.inputGraph = null;
+    repaint();
   }
 
   public void update(LloydStep.Graph graph) {
     this.inputGraph = graph;
+    this.lloydStep = null;
+    repaint();
   }
 
   private void drawLines(Graphics g) {
@@ -25,17 +29,14 @@ public class Canvas extends JPanel {
     g2d.setStroke(new BasicStroke(3));
 
     if (lloydStep == null) {
-      System.out.println("Showing input graph");
       drawNodes(g2d, inputGraph);
       drawEdges(g2d, inputGraph);
     } else {
-      System.out.println("Showing lloydstep");
       drawNodes(g2d, lloydStep.inputGraph);
-      drawEdges(g2d, lloydStep.inputGraph);
+//      drawEdges(g2d, lloydStep.inputGraph);
       drawDelaunyTriangles(g2d);
       drawVoronoiCells(g2d);
     }
-
   }
 
   private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {
@@ -44,7 +45,7 @@ public class Canvas extends JPanel {
       g2d.fillOval((int) node.x * SCALING_CONST - 5, (int) node.y * SCALING_CONST - 5, 10, 10);
       g2d.setColor(Color.BLACK);
       g2d.drawString(node.id, (int) node.x * SCALING_CONST - 5, (int) node.y * SCALING_CONST - 5);
-      System.out.println("Drawing " + node.id + " at (" + ((int) node.x * SCALING_CONST - 5) + ", " + ((int) node.y * SCALING_CONST - 5) + ")");
+//      System.out.println("Drawing " + node.id + " at (" + ((int) node.x * SCALING_CONST - 5) + ", " + ((int) node.y * SCALING_CONST - 5) + ")");
     }
   }
 

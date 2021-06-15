@@ -11,7 +11,7 @@ public class Model {
 
   private List<LloydStep> lloydSteps;
   private LloydStep.Graph inputGraph;
-  private int index = 0;
+  private int index = -1;
 
   private Set<View> views = new HashSet<>();
 
@@ -34,14 +34,25 @@ public class Model {
   }
 
   public LloydStep nextStep() {
-    return lloydSteps.get(++index);
+    if (index == lloydSteps.size() - 1) return lloydSteps.get(index);
+    index++;
+    var step = lloydSteps.get(index);
+    updateViews();
+    return step;
   }
 
   public LloydStep previousStep() {
-    return lloydSteps.get(--index);
+    if (index == -1) return lloydSteps.get(0);
+    index--;
+    updateViews();
+    if (index < 0) {
+      return lloydSteps.get(0);
+    }
+    return lloydSteps.get(index);
   }
 
   public LloydStep getCurrentStep() {
+    if (index < 0) return null;
     return lloydSteps.get(index);
   }
 
@@ -49,4 +60,7 @@ public class Model {
     return inputGraph;
   }
 
+  public int getIndex() {
+    return index;
+  }
 }

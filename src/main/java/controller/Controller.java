@@ -17,7 +17,14 @@ public class Controller implements MouseListener, ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent actionEvent) {
-
+    switch (actionEvent.getActionCommand()) {
+      case "<":
+        model.previousStep();
+        break;
+      case ">":
+        model.nextStep();
+        break;
+    }
   }
 
   @Override

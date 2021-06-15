@@ -12,6 +12,8 @@ public class MainView extends JFrame implements View {
   private Controller controller;
   private Canvas canvas;
 
+  private JLabel step = new JLabel();
+
   public MainView(Controller controller) {
     this.controller = controller;
 
@@ -35,18 +37,35 @@ public class MainView extends JFrame implements View {
     canvas.setBackground(Color.LIGHT_GRAY);
     add(canvas, BorderLayout.CENTER);
 
-//    JPanel right = new JPanel();
-//    right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-//    for (int i = 0; i < 20; i++) {
-//      right.add(new JButton("Dummy Button " + i));
-//    }
-//    add(right, BorderLayout.EAST);
+    JPanel right = new JPanel();
+    right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+
+    JPanel labelContainer = new JPanel(new FlowLayout());
+    JLabel navLabel = new JLabel("Algorithm control");
+    navLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+    labelContainer.add(navLabel);
+    right.add(labelContainer);
+
+    JPanel stepContainer = new JPanel(new FlowLayout());
+    step.setText("Step 0/0");
+    stepContainer.add(step);
+    right.add(stepContainer);
+
+    JPanel nav = new JPanel(new FlowLayout());
+    JButton prev = new JButton("<");
+    JButton next = new JButton(">");
+    next.addActionListener(controller);
+    prev.addActionListener(controller);
+    nav.add(prev);
+    nav.add(next);
+    right.add(nav);
+    add(right, BorderLayout.EAST);
 
 //    JPanel footer = new JPanel();
 //    footer.add(new JLabel("Fooooooooooooooter"));
 //    add(footer, BorderLayout.SOUTH);
 
-    setSize(1920, 1080);
+    setSize(1280, 720);
     setLocationRelativeTo(null);
     setVisible(true);
     JFrame.setDefaultLookAndFeelDecorated(true);
@@ -54,11 +73,10 @@ public class MainView extends JFrame implements View {
 
   @Override
   public void update(Model model) {
-    if (model.getLloydSteps().size() == 0) {
-      System.out.println("Updating inputgraph");
+    if (model.getLloydSteps().size() == 0 || model.getIndex() < 0) {
       canvas.update(model.getInputGraph());
     } else {
-      System.out.println("Updating lloydsteps");
+      step.setText("Step " + model.getIndex() + "/" + (model.getLloydSteps().size()-1));
       canvas.update(model.getCurrentStep());
     }
   }
