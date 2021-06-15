@@ -40,6 +40,7 @@ public class LloydRelaxation {
 	
 	public void computeSteps() {
 
+		//lloydSteps.add(new LloydStep(transformedGraph));
 		ArrayList<Edge> edges = new ArrayList<>();
 		for (Edge e : transformedGraph.edges) {
 			edges.add(new Edge(e.from, e.to));

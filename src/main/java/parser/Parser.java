@@ -13,6 +13,10 @@ import org.eclipse.emf.common.util.EList;
 public class Parser {
 
 	public static ElkNode parse(String file) throws IOException {
+		//Random r = new Random();
+		//int t = r.nextInt();
+		//System.out.println(t);
+		//606182302
 		Random rnd = new Random();
 		ElkNode graph = ElkGraphUtil.createGraph();
 		graph.setIdentifier("root");
@@ -63,7 +67,7 @@ public class Parser {
 		return graph;
 	}
 	
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		ElkNode test;
 		try {
 			test = parse("TestGraph.Elkt");
@@ -72,5 +76,5 @@ public class Parser {
 		} catch (IOException e) {
 			System.out.println("File not found!");
 		}
-	}
+	}*/
 }

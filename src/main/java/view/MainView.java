@@ -41,12 +41,15 @@ public MainView() throws IOException {
     var algorithm = new LloydRelaxation(testGraph);
     algorithm.computeSteps();
 
-    var SCALING_CONST = 5;
+    var SCALING_CONST = 3;
     JPanel center = new JPanel(){
       void drawLines(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setStroke(new BasicStroke(3));
+        
+        g2d.drawLine(200 * SCALING_CONST, 0, 200 * SCALING_CONST, 200 * SCALING_CONST);
+        g2d.drawLine(0, 200 * SCALING_CONST, 200 * SCALING_CONST, 200 * SCALING_CONST);
 
         for (var triangle: algorithm.lloydSteps.get(0).delaunayTriangles){
           for (var edge: triangle.edges){
