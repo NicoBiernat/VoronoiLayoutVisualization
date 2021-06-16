@@ -1,5 +1,11 @@
 # Voronoi Layout Algorithm Visualization
 
+## How to start
+#### Linux / MacOS:  
+`./gradlew run`  
+#### Windows:  
+`gradlew.bat run`  
+
 ## Current Progress
 We implemented a parser for our graph input format, Lloyd's algorithm for Voronoi layouting (although there might be some bugs or edge cases left), a Model-View-Controller architecture for the interactive application as well as a visualization of the input graph (after force layout) and for each major step (Delaunay triangles + Voronoi cells) in Lloyd's algorithm. There currently are two buttons to step forward or backward through the algorithm.
 
