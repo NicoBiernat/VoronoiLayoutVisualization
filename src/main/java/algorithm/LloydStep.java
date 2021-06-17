@@ -251,7 +251,6 @@ public class LloydStep {
 	public final Graph inputGraph;
 	public final List<DelaunayTriangle> delaunayTriangles;
 	public final List<VoronoiCell> voronoiCells = new ArrayList<>();
-	public final Map<DelaunayEdge, VoronoiEdge> delaunayVoronoiEdgeMap = new HashMap<>();
 
 	public LloydStep(Graph inputGraph) {
 		this.inputGraph = inputGraph;

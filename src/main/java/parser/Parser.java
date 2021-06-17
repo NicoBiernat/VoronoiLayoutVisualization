@@ -28,7 +28,7 @@ public class Parser {
 		while (sc.hasNext()) {
 			line = sc.next();
 			Scanner statement = new Scanner(line);
-			if (line.toString().matches("^\\s*node\\s+(\\S+)\\s*$|^\\s*edge\\s*(\\S+)\\s*->\\s*(\\S+)\\s*$")) {
+			if (line.toString().matches("^\\s*node\\s+(\\S+)\\s*$|^\\s*edge\\s+(\\S+)\\s*->\\s*(\\S+)\\s*$")) {
 				String s = statement.next();
 				switch (s) {
 				case "node":
