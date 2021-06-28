@@ -27,39 +27,9 @@ public class Main {
   private static final String FILE_NAME = "TestGraph.elkt";
 
   public static void main(String[] args) {
-    ElkNode testGraph;
-    //var testGraph = generateRandomGraph(20, 0, new Random(1));
-    //Es werden random edges erstellt. Nicht sicher wo/warum.
-    try {
-      testGraph = Parser.parse(FILE_NAME);
-    } catch (IOException e) {
-      System.err.println("Could not read or parse file: " + FILE_NAME);
-      e.printStackTrace();
-      return;
-    }
-    System.out.println("Parsed graph:");
-    List<ElkNode> nodes = testGraph.getChildren();
-    for (ElkNode n : nodes) {
-      System.out.println(n.getIdentifier());
-    }
-    for (ElkEdge e : testGraph.getContainedEdges()) {
-      System.out.println(e.getSources().get(0).getIdentifier() + " -> " + e.getTargets().get(0).getIdentifier());
-    }
 
-    System.out.println("Running force based algorithm");
-    testGraph.setProperty(CoreOptions.ALGORITHM, ForceOptions.ALGORITHM_ID);
-    testGraph.setProperty(CoreOptions.SPACING_NODE_NODE, 10000.0);
-    testGraph.setProperty(ForceMetaDataProvider.ITERATIONS, 10000);
-    RecursiveGraphLayoutEngine layoutEngine = new RecursiveGraphLayoutEngine();
-    layoutEngine.layout(testGraph, new BasicProgressMonitor());
-    System.out.println("Force based layout done");
-
-    System.out.println("Transforming ElkGraph into own format");
-    LloydRelaxation algorithm = new LloydRelaxation(testGraph);
-    algorithm.computeSteps();
-    algorithm.transformedGraph.nodes.forEach(n -> System.out.println(n.id + ": (" + n.x + ", " + n.y+ ")"));
     System.out.println("Creating MVC");
-    Model model = new Model(algorithm.lloydSteps, algorithm.transformedGraph);
+    Model model = new Model(null, null);
     Controller controller = new Controller(model);
     MainView view = new MainView(controller);
     model.registerView(view);
