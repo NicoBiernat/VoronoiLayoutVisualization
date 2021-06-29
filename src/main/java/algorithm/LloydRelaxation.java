@@ -41,10 +41,6 @@ public class LloydRelaxation {
 	public void computeSteps() {
 
 		//lloydSteps.add(new LloydStep(transformedGraph));
-		ArrayList<Edge> edges = new ArrayList<>();
-		for (Edge e : transformedGraph.edges) {
-			edges.add(new Edge(e.from, e.to));
-		}
 
 		lloydSteps.add(new LloydStep(transformedGraph));
 		
@@ -54,16 +50,24 @@ public class LloydRelaxation {
 			LloydStep last = lloydSteps.get(i);
 			ArrayList<Node> nodes = new ArrayList<>();
 
+			var newNodesMap = new HashMap<Node,Node>();
+
 			for (Node n : last.inputGraph.nodes) {
 				Node centroid = last.getVoronoiCellForNode(n).getCentroid();
 				end = distance(n, centroid);
-				nodes.add(new Node(n.id, centroid.x, centroid.y));
+				var newNode = new Node(n.id, centroid.x, centroid.y);
+				nodes.add(newNode);
+				newNodesMap.put(n,newNode);
+			}
+
+			var edges = new ArrayList<Edge>();
+			for (Edge e : last.inputGraph.edges) {
+				edges.add(new Edge(newNodesMap.get(e.from), newNodesMap.get(e.to)));
 			}
 
 			lloydSteps.add(new LloydStep(new Graph(nodes, edges)));
 			i++;
 		}
-		System.out.println("Steps: " + i);
 	}
 
 }

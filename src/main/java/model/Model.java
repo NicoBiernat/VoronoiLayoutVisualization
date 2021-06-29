@@ -52,12 +52,12 @@ public class Model {
     }
     System.out.println("Parsed graph:");
     List<ElkNode> nodes = testGraph.getChildren();
-    for (ElkNode n : nodes) {
+    /*for (ElkNode n : nodes) {
       System.out.println(n.getIdentifier());
     }
     for (ElkEdge e : testGraph.getContainedEdges()) {
       System.out.println(e.getSources().get(0).getIdentifier() + " -> " + e.getTargets().get(0).getIdentifier());
-    }
+    }*/
 
     System.out.println("Running force based algorithm");
     testGraph.setProperty(CoreOptions.ALGORITHM, ForceOptions.ALGORITHM_ID);
@@ -70,7 +70,6 @@ public class Model {
     System.out.println("Transforming ElkGraph into own format");
     LloydRelaxation algorithm = new LloydRelaxation(testGraph);
     algorithm.computeSteps();
-    algorithm.transformedGraph.nodes.forEach(n -> System.out.println(n.id + ": (" + n.x + ", " + n.y+ ")"));
 
     this.lloydSteps= algorithm.lloydSteps;
     this.inputGraph= algorithm.transformedGraph;

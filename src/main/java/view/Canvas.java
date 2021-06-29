@@ -66,6 +66,9 @@ public class Canvas extends JPanel {
 //      drawEdges(g2d, lloydStep.inputGraph);
     drawDelaunyTriangles(g2d);
     drawVoronoiCells(g2d);
+
+    g2d.setStroke(new BasicStroke(2));
+    drawEdges(g2d, lloydStep.inputGraph);
   }
 
   private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {

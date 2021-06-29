@@ -172,9 +172,6 @@ public class MainView extends JFrame implements View {
     else
       selectedFile.setText("selected: "+pathLengthShortener(model.getSelectedFile().getPath(),20));
 
-    System.out.println(model.getLloydSteps());
-    System.out.println(model.getInputGraph());
-    System.out.println(model.getIndex());
     if (model.getLloydSteps()!=null && model.getInputGraph()!=null) {
       if (model.getLloydSteps().size() == 0 || model.getIndex() < 0){
         step.setText("Input Graph");

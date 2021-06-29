@@ -304,7 +304,6 @@ public class LloydStep {
 				}
 
 				var frameCrossing = new Node("F" + circumCenter.toString(), circumCenter.x + dx, circumCenter.y + dy);
-				System.out.println(frameCrossing);
 				var voronoiEdge = new Edge(circumCenter, frameCrossing);
 				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
 				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
