@@ -46,16 +46,19 @@ public class LloydRelaxation {
 		
 		Boolean end = true;
 		int i = 0;
-		while (end) {
+		while (end && lloydSteps.size()<400) {
 			LloydStep last = lloydSteps.get(i);
 			ArrayList<Node> nodes = new ArrayList<>();
 
 			var newNodesMap = new HashMap<Node,Node>();
 
+			final double RELAXATION_MOVING_RATE=0.5;
 			for (Node n : last.inputGraph.nodes) {
 				Node centroid = last.getVoronoiCellForNode(n).getCentroid();
 				end = distance(n, centroid);
-				var newNode = new Node(n.id, centroid.x, centroid.y);
+				var newNode = new Node(n.id,
+						n.x*(1-RELAXATION_MOVING_RATE) + centroid.x*RELAXATION_MOVING_RATE,
+						n.y*(1-RELAXATION_MOVING_RATE) + centroid.y*RELAXATION_MOVING_RATE);
 				nodes.add(newNode);
 				newNodesMap.put(n,newNode);
 			}

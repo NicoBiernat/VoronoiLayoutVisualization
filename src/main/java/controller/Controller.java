@@ -2,6 +2,7 @@ package controller;
 
 import model.Model;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -13,24 +14,39 @@ public class Controller implements MouseListener, ActionListener {
   private Model model;
 
   public Controller(Model model) {
+
     this.model = model;
+
+    //FIXME: dev override
+    fileSelected(new File(".\\TestGraph.elkt"));
   }
 
-  public void fileSelected(File file){
-    model.loadFile(file);
-  }
+  public void fileSelected(File file){ model.loadFile(file); }
 
   @Override
   public void actionPerformed(ActionEvent actionEvent) {
     switch (actionEvent.getActionCommand()) {
-      case "<":
+      case "<||":
         model.previousStep();
         break;
-      case ">":
+      case "||>":
         model.nextStep();
+        break;
+      case "|<<":
+        model.firstStep();
+        break;
+      case ">>|":
+        model.lastStep();
+        break;
+      case "|>":
+        model.playSteps();
+        break;
+      case "||":
+        model.pauseSteps();
         break;
     }
   }
+
 
   @Override
   public void mouseClicked(MouseEvent mouseEvent) {
@@ -55,5 +71,15 @@ public class Controller implements MouseListener, ActionListener {
   @Override
   public void mouseExited(MouseEvent mouseEvent) {
 
+  }
+
+  public void speedSliderChanged(int newValue) {
+    model.setPlaybackSpeed(1000/(newValue+1));
+  }
+
+  public void stepSliderChanged(int newStep) { model.setStep(newStep);}
+
+  public void setDisplayOption(String option,boolean value) {
+    model.setDisplayOption(option,value);
   }
 }

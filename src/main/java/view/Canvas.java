@@ -4,6 +4,7 @@ import algorithm.LloydStep;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class Canvas extends JPanel {
   int SCALING_CONST = 1;
@@ -11,16 +12,19 @@ public class Canvas extends JPanel {
 
   private LloydStep lloydStep;
   private LloydStep.Graph inputGraph;
+  private HashMap<String, Boolean> displayOptions;
 
-  public void update(LloydStep lloydStep) {
+  public void update(LloydStep lloydStep, HashMap<String,Boolean> displayOptions) {
     this.lloydStep = lloydStep;
     this.inputGraph = null;
+    this.displayOptions=displayOptions;
     repaint();
   }
 
-  public void update(LloydStep.Graph graph) {
+  public void update(LloydStep.Graph graph, HashMap<String,Boolean> displayOptions) {
     this.inputGraph = graph;
     this.lloydStep = null;
+    this.displayOptions=displayOptions;
     repaint();
   }
   //source: https://stackoverflow.com/a/18565148/7421438
@@ -61,14 +65,19 @@ public class Canvas extends JPanel {
       return;
     }
 
-    drawVoronoiCentroids(g2d);
-    drawNodes(g2d, lloydStep.inputGraph);
-//      drawEdges(g2d, lloydStep.inputGraph);
-    drawDelaunyTriangles(g2d);
-    drawVoronoiCells(g2d);
-
+    if (displayOptions.getOrDefault("Voronoi Centroids",false))
+      drawVoronoiCentroids(g2d);
+    if (displayOptions.getOrDefault("Graph Nodes",false))
+      drawNodes(g2d, lloydStep.inputGraph);
+    if (displayOptions.getOrDefault("Delaunay Edges",false))
+      drawDelaunyTriangles(g2d);
+    if (displayOptions.getOrDefault("Voronoi Edges",false))
+      drawVoronoiEdges(g2d);
+    if (displayOptions.getOrDefault("Voronoi Nodes",false))
+      drawVoronoiNodes(g2d);
     g2d.setStroke(new BasicStroke(2));
-    drawEdges(g2d, lloydStep.inputGraph);
+    if (displayOptions.getOrDefault("Graph Edges",false))
+      drawEdges(g2d, lloydStep.inputGraph);
   }
 
   private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {
@@ -92,7 +101,7 @@ public class Canvas extends JPanel {
     for (var triangle : lloydStep.delaunayTriangles) {
       for (var edge : triangle.edges) {
         g2d.setColor(Color.ORANGE);
-        g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
+        g2d.drawLine((int) edge.from.x * SCALING_CONST + OFFSET_CONST, (int) edge.from.y * SCALING_CONST + OFFSET_CONST, (int) edge.to.x * SCALING_CONST + OFFSET_CONST, (int) edge.to.y * SCALING_CONST + OFFSET_CONST);
       }
           /*var centroid = triangle.getNodesCentroid();
           g2d.setColor(Color.BLUE);
@@ -102,6 +111,8 @@ public class Canvas extends JPanel {
           g2d.fillOval((int)centroid.x*SCALING_CONST-5, (int)centroid.y*SCALING_CONST-6,12,12);*/
 
     }
+  }
+  private void drawVoronoiNodes(Graphics2D g2d){
     for (var triangle : lloydStep.delaunayTriangles) {
       var centroid = triangle.getCircumCircle().center;
       g2d.setColor(Color.BLUE);
@@ -111,7 +122,7 @@ public class Canvas extends JPanel {
     }
   }
 
-  private void drawVoronoiCells(Graphics2D g2d) {
+  private void drawVoronoiEdges(Graphics2D g2d) {
     for (var cell : lloydStep.voronoiCells) {
       for (var edge : cell.edges) {
         g2d.setColor(Color.BLUE);

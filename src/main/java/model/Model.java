@@ -5,6 +5,7 @@ import algorithm.LloydStep;
 import org.eclipse.elk.alg.force.options.ForceMetaDataProvider;
 import org.eclipse.elk.alg.force.options.ForceOptions;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
+import org.eclipse.elk.core.math.KVector;
 import org.eclipse.elk.core.options.CoreOptions;
 import org.eclipse.elk.core.util.BasicProgressMonitor;
 import org.eclipse.elk.graph.ElkEdge;
@@ -14,6 +15,7 @@ import view.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ public class Model {
 
   private List<LloydStep> lloydSteps;
   private LloydStep.Graph inputGraph;
+
   private int index = -1;
 
   private Set<View> views = new HashSet<>();
@@ -74,6 +77,10 @@ public class Model {
     this.lloydSteps= algorithm.lloydSteps;
     this.inputGraph= algorithm.transformedGraph;
 
+    for (var option : Model.DISPLAY_OPTIONS) {
+      this.displayOptions.put(option,true); //initialize all display options with being ticked
+    }
+
     updateViews();
   }
 
@@ -108,6 +115,51 @@ public class Model {
     return lloydSteps.get(index);
   }
 
+
+  public void firstStep() {
+    index=0;
+    updateViews();
+  }
+
+  public void lastStep() {
+    index=lloydSteps.size()-1;
+    updateViews();
+  }
+
+  private Thread playingThread;
+
+  //TODO this is not pretty but it works, maybe reuse threads, and make everything more thread safe i guess
+  public void playSteps() {
+    if (playingThread==null){
+      playingThread = new Thread(() -> {
+        while (playingThread!=null && index<lloydSteps.size()-1){
+          index++;
+          try {
+            //TODO implement interpolation
+            //TODO implement substeps
+            Thread.sleep(playBackSpeed);
+          } catch (InterruptedException e) {
+            //swallow
+          }
+          updateViews();
+        }
+        playingThread=null;
+        updateViews();
+      });
+      playingThread.start();
+    }
+  }
+  public boolean isPlayingSteps(){
+    return playingThread!=null;
+  }
+
+  public void pauseSteps() {
+    if (playingThread!=null) {
+      playingThread = null;
+      updateViews();
+    }
+  }
+
   public LloydStep getCurrentStep() {
     if (index < 0) return null;
     return lloydSteps.get(index);
@@ -119,5 +171,29 @@ public class Model {
 
   public int getIndex() {
     return index;
+  }
+  int playBackSpeed=(1000/(50+1));
+
+  public void setPlaybackSpeed(int newSpeed) {
+    playBackSpeed=newSpeed;
+  }
+
+  public void setStep(int step) {
+    if (step<-1) index=-1;
+    else if (step>lloydSteps.size()-1) index=lloydSteps.size()-1;
+    else index=step;
+    updateViews();
+  }
+
+  private HashMap<String,Boolean> displayOptions = new HashMap<>();
+  public void setDisplayOption(String option, boolean value) {
+    displayOptions.put(option,value);
+    updateViews();
+  }
+
+  public static final String[] DISPLAY_OPTIONS={"Graph Nodes", "Graph Edges", "Delaunay Edges", "Voronoi Edges", "Voronoi Nodes", "Voronoi Centroids"};
+
+  public HashMap<String, Boolean> getDisplayOptions() {
+    return displayOptions;
   }
 }
