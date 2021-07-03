@@ -18,7 +18,7 @@ public class Controller implements MouseListener, ActionListener {
     this.model = model;
 
     //FIXME: dev override
-    fileSelected(new File(".\\TestGraph.elkt"));
+//    fileSelected(new File("./TestGraph.elkt")); // not everyone is using Windows :/
   }
 
   public void fileSelected(File file){ model.loadFile(file); }
@@ -27,10 +27,10 @@ public class Controller implements MouseListener, ActionListener {
   public void actionPerformed(ActionEvent actionEvent) {
     switch (actionEvent.getActionCommand()) {
       case "<||":
-        model.previousStep();
+        model.previousStepOrSubstep();
         break;
       case "||>":
-        model.nextStep();
+        model.nextStepOrSubstep();
         break;
       case "|<<":
         model.firstStep();

@@ -15,10 +15,7 @@ import view.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Model {
 
@@ -30,6 +27,7 @@ public class Model {
   private LloydStep.Graph inputGraph;
 
   private int index = -1;
+  private int substepIndex = 0;
 
   private Set<View> views = new HashSet<>();
 
@@ -105,6 +103,24 @@ public class Model {
     return step;
   }
 
+  public void nextStepOrSubstep() {
+    if (index >= 0 && displayOptions.getOrDefault(DISPLAY_OPTIONS[6], false)) { // substeps enabled
+      substepIndex++;
+      if (substepIndex >= substepOptions.size()) {
+        substepIndex = 0;
+        nextStep();
+      }
+      substepOptions.get(substepIndex).forEach(this::setDisplayOption);
+//      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
+    } else {
+      substepIndex = 0;
+      nextStep();
+    }
+    updateViews();
+//    System.out.println("Step: " + index + " Substep: " + substepIndex);
+//    System.out.println();
+  }
+
   public LloydStep previousStep() {
     if (index == -1) return lloydSteps.get(0);
     index--;
@@ -115,14 +131,33 @@ public class Model {
     return lloydSteps.get(index);
   }
 
+  public void previousStepOrSubstep() {
+    if (index >= 0 && displayOptions.getOrDefault(DISPLAY_OPTIONS[6], false)) { // substeps enabled
+      substepIndex--;
+      if (substepIndex < 0) {
+        substepIndex = substepOptions.size() - 1;
+        previousStep();
+      }
+      substepOptions.get(substepIndex).forEach(this::setDisplayOption);
+//      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
+    } else {
+      substepIndex = 0;
+      previousStep();
+    }
+    updateViews();
+//    System.out.println("Step: " + index + " Substep: " + substepIndex);
+//    System.out.println();
+  }
 
   public void firstStep() {
-    index=0;
+    index=-1;
+    substepIndex = 0;
     updateViews();
   }
 
   public void lastStep() {
     index=lloydSteps.size()-1;
+    substepIndex = 0;
     updateViews();
   }
 
@@ -133,7 +168,7 @@ public class Model {
     if (playingThread==null){
       playingThread = new Thread(() -> {
         while (playingThread!=null && index<lloydSteps.size()-1){
-          index++;
+          nextStepOrSubstep();
           try {
             //TODO implement interpolation
             //TODO implement substeps
@@ -172,6 +207,15 @@ public class Model {
   public int getIndex() {
     return index;
   }
+
+  public int getSubstepIndex() {
+    return substepIndex;
+  }
+
+  public int getNumSubsteps() {
+    return substepOptions.size();
+  }
+
   int playBackSpeed=(1000/(50+1));
 
   public void setPlaybackSpeed(int newSpeed) {
@@ -179,21 +223,82 @@ public class Model {
   }
 
   public void setStep(int step) {
+    if (lloydSteps == null) return;
     if (step<-1) index=-1;
     else if (step>lloydSteps.size()-1) index=lloydSteps.size()-1;
     else index=step;
     updateViews();
   }
 
-  private HashMap<String,Boolean> displayOptions = new HashMap<>();
+  private Map<String,Boolean> displayOptions = new HashMap<>();
   public void setDisplayOption(String option, boolean value) {
     displayOptions.put(option,value);
     updateViews();
   }
 
-  public static final String[] DISPLAY_OPTIONS={"Graph Nodes", "Graph Edges", "Delaunay Edges", "Voronoi Edges", "Voronoi Nodes", "Voronoi Centroids"};
+  public static final String[] DISPLAY_OPTIONS={"Graph Nodes", "Graph Edges", "Delaunay Edges", "Voronoi Edges", "Voronoi Nodes", "Voronoi Centroids", "Enable Substeps"};
 
-  public HashMap<String, Boolean> getDisplayOptions() {
+  public Map<String, Boolean> getDisplayOptions() {
     return displayOptions;
   }
+
+  /*
+  0 -> show nodes + edges
+  1 -> show nodes
+  2 -> show nodes + delaunay edges
+  3 -> show nodes + delaunay edges + voronoi edges
+  4 -> show nodes + voronoi edges + voronoi nodes
+  5 -> show nodes + voronoi edges + voronoi nodes + voronoi centroids
+  6 -> show nodes + voronoi centroids + arrows
+   */
+  private final List<Map<String, Boolean>> substepOptions = Arrays.asList(
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], true,
+                  DISPLAY_OPTIONS[2], false,
+                  DISPLAY_OPTIONS[3], false,
+                  DISPLAY_OPTIONS[4], false,
+                  DISPLAY_OPTIONS[5], false,
+                  DISPLAY_OPTIONS[6], true),  // nodes and edges
+          Map.of(DISPLAY_OPTIONS[0],true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], false,
+                  DISPLAY_OPTIONS[3], false,
+                  DISPLAY_OPTIONS[4], false,
+                  DISPLAY_OPTIONS[5], false,
+                  DISPLAY_OPTIONS[6], true),                               // nodes
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], true,
+                  DISPLAY_OPTIONS[3], false,
+                  DISPLAY_OPTIONS[4], false,
+                  DISPLAY_OPTIONS[5], false,
+                  DISPLAY_OPTIONS[6], true), // nodes and delaunay edges
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], true,
+                  DISPLAY_OPTIONS[3], true,
+                  DISPLAY_OPTIONS[4], false,
+                  DISPLAY_OPTIONS[5], false,
+                  DISPLAY_OPTIONS[6], true), // nodes, delaunay edges and voronoi edges
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], false,
+                  DISPLAY_OPTIONS[3], true,
+                  DISPLAY_OPTIONS[4], true,
+                  DISPLAY_OPTIONS[6], true), // nodes, voronoi edges and voronoi nodes
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], false,
+                  DISPLAY_OPTIONS[3], true,
+                  DISPLAY_OPTIONS[4], true,
+                  DISPLAY_OPTIONS[5], true,
+                  DISPLAY_OPTIONS[6], true), // nodes, voronoi edges, voronoi nodes and voronoi centroids
+          Map.of(DISPLAY_OPTIONS[0], true,
+                  DISPLAY_OPTIONS[1], false,
+                  DISPLAY_OPTIONS[2], false,
+                  DISPLAY_OPTIONS[3], false,
+                  DISPLAY_OPTIONS[4], false,
+                  DISPLAY_OPTIONS[5], true,
+                  DISPLAY_OPTIONS[6], true) // nodes and voronoi centroids
+  );
 }

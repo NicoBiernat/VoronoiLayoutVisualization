@@ -271,7 +271,7 @@ public class LloydStep {
 		//if coordinates are too small scale offset
 		if (minX<0 || minY<0){
 			var offset = Math.min(minY,minX);
-			System.out.println("offset: "+offset);
+//			System.out.println("offset: "+offset);
 			inputGraph.nodes.stream().forEach(n->n.rescale(offset,1));
 			delaunayTriangles.stream().forEach(t->t.getCircumCircle().center.rescale(offset,1));
 		}
@@ -286,7 +286,7 @@ public class LloydStep {
 		//if coordinates are too big scale down
 		if (maxX>WIDTH || maxY>HEIGHT){
 			var scaling = Math.min((WIDTH*0.9)/maxX,(HEIGHT*0.9)/maxY);
-			System.out.println("scaling: "+scaling);
+//			System.out.println("scaling: "+scaling);
 			inputGraph.nodes.stream().forEach(n->n.rescale(0,scaling));
 			delaunayTriangles.stream().forEach(t->t.getCircumCircle().center.rescale(0,scaling));
 		}

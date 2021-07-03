@@ -4,29 +4,64 @@ import algorithm.LloydStep;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.Map;
 
 public class Canvas extends JPanel {
-  int SCALING_CONST = 1;
-  int OFFSET_CONST = 20;
+  double SCALING_CONST = 1;
+  double OFFSET_CONST = 20;
+  double PADDING = 20;
 
   private LloydStep lloydStep;
   private LloydStep.Graph inputGraph;
-  private HashMap<String, Boolean> displayOptions;
+  private Map<String, Boolean> displayOptions;
 
-  public void update(LloydStep lloydStep, HashMap<String,Boolean> displayOptions) {
+  public Canvas() {
+    super();
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        super.componentResized(e);
+        updateScaling(e.getComponent().getWidth(), e.getComponent().getHeight());
+      }
+    });
+  }
+
+  public void update(LloydStep lloydStep, Map<String,Boolean> displayOptions) {
     this.lloydStep = lloydStep;
     this.inputGraph = null;
     this.displayOptions=displayOptions;
+    updateScaling(getWidth(), getHeight());
     repaint();
   }
 
-  public void update(LloydStep.Graph graph, HashMap<String,Boolean> displayOptions) {
+  public void update(LloydStep.Graph graph, Map<String,Boolean> displayOptions) {
     this.inputGraph = graph;
     this.lloydStep = null;
     this.displayOptions=displayOptions;
+    updateScaling(getWidth(), getHeight());
     repaint();
   }
+
+  private void updateScaling(double width, double height) {
+    double minCanvasSize = Math.min(width, height);
+    java.util.List<LloydStep.Node> nodes;
+    if (inputGraph != null) {
+      nodes = inputGraph.nodes;
+    } else if (lloydStep != null) {
+      nodes = lloydStep.inputGraph.nodes;
+    } else {
+      return;
+    }
+    double maxNodeCoord = Double.NEGATIVE_INFINITY;
+    for (LloydStep.Node n : nodes) {
+      if (n.x > maxNodeCoord) maxNodeCoord = n.x;
+      if (n.y > maxNodeCoord) maxNodeCoord = n.y;
+    }
+    SCALING_CONST = minCanvasSize / (maxNodeCoord + 4*OFFSET_CONST);
+  }
+
   //source: https://stackoverflow.com/a/18565148/7421438
   private void drawStringMiddleOfPanel(String string, Graphics g) {
     String msg = string;
@@ -85,7 +120,7 @@ public class Canvas extends JPanel {
       g2d.setColor(Color.RED);
       drawOval(Color.RED,node.x,node.y,14,g2d);
       g2d.setColor(Color.BLACK);
-      g2d.drawString(node.id, (int) node.x * SCALING_CONST - 5+OFFSET_CONST, (int) node.y * SCALING_CONST - 5+OFFSET_CONST);
+      g2d.drawString(node.id, (int) (node.x * SCALING_CONST - 5+OFFSET_CONST), (int) (node.y * SCALING_CONST - 5+OFFSET_CONST));
 //      System.out.println("Drawing " + node.id + " at (" + ((int) node.x * SCALING_CONST - 5) + ", " + ((int) node.y * SCALING_CONST - 5) + ")");
     }
   }
@@ -93,7 +128,7 @@ public class Canvas extends JPanel {
   private void drawEdges(Graphics2D g2d, LloydStep.Graph graph) {
     for (var edge : graph.edges) {
       g2d.setColor(Color.BLACK);
-      g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
+      g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
     }
   }
 
@@ -101,7 +136,7 @@ public class Canvas extends JPanel {
     for (var triangle : lloydStep.delaunayTriangles) {
       for (var edge : triangle.edges) {
         g2d.setColor(Color.ORANGE);
-        g2d.drawLine((int) edge.from.x * SCALING_CONST + OFFSET_CONST, (int) edge.from.y * SCALING_CONST + OFFSET_CONST, (int) edge.to.x * SCALING_CONST + OFFSET_CONST, (int) edge.to.y * SCALING_CONST + OFFSET_CONST);
+        g2d.drawLine((int) (edge.from.x * SCALING_CONST + OFFSET_CONST), (int) (edge.from.y * SCALING_CONST + OFFSET_CONST), (int) (edge.to.x * SCALING_CONST + OFFSET_CONST), (int) (edge.to.y * SCALING_CONST + OFFSET_CONST));
       }
           /*var centroid = triangle.getNodesCentroid();
           g2d.setColor(Color.BLUE);
@@ -118,7 +153,7 @@ public class Canvas extends JPanel {
       g2d.setColor(Color.BLUE);
       drawOval(Color.BLUE,centroid.x,centroid.y,14,g2d);
       g2d.setColor(Color.BLACK);
-      g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) centroid.x * SCALING_CONST - 5+OFFSET_CONST, (int) centroid.y * SCALING_CONST - 5+OFFSET_CONST);
+      g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) (centroid.x * SCALING_CONST - 5+OFFSET_CONST), (int) (centroid.y * SCALING_CONST - 5+OFFSET_CONST));
     }
   }
 
@@ -126,7 +161,7 @@ public class Canvas extends JPanel {
     for (var cell : lloydStep.voronoiCells) {
       for (var edge : cell.edges) {
         g2d.setColor(Color.BLUE);
-        g2d.drawLine((int) edge.from.x * SCALING_CONST+OFFSET_CONST, (int) edge.from.y * SCALING_CONST+OFFSET_CONST, (int) edge.to.x * SCALING_CONST+OFFSET_CONST, (int) edge.to.y * SCALING_CONST+OFFSET_CONST);
+        g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
       }
     }
   }
