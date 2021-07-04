@@ -40,7 +40,7 @@ public class Model {
     this.inputGraph = inputGraph;
   }
 
-  public void loadFile(File file){
+  public void loadFile(File file) {
     this.selectedFile = file;
 
     ElkNode testGraph;
@@ -52,6 +52,9 @@ public class Model {
       return;
     }
     System.out.println("Parsed graph:");
+    loadGraph(testGraph);
+  }
+  public void loadGraph(ElkNode testGraph){
     List<ElkNode> nodes = testGraph.getChildren();
     /*for (ElkNode n : nodes) {
       System.out.println(n.getIdentifier());

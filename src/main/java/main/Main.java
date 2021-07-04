@@ -24,8 +24,6 @@ import java.util.Random;
 
 public class Main {
 
-  private static final String FILE_NAME = "TestGraph.elkt";
-
   public static void main(String[] args) {
 
     System.out.println("Creating MVC");
@@ -33,6 +31,8 @@ public class Main {
     Controller controller = new Controller(model);
     MainView view = new MainView(controller);
     model.registerView(view);
+    //FIXME: dev override
+    model.loadGraph(generateRandomGraph(17,100,new Random(8)));
   }
 
   public static ElkNode generateRandomGraph(int numNodes, int numEdges, Random rnd) {

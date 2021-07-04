@@ -245,11 +245,23 @@ public class LloydStep {
 		public String toString() {
 			return nodes.toString() + "\n" + edges.toString();
 		}
+
+		public void rescale(int width, int height, int pad) {
+			var offset = Math.min(nodes.stream().mapToDouble(n->n.x).min().orElse(0),
+					                     nodes.stream().mapToDouble(n->n.y).min().orElse(0))+pad;
+			var scale = Math.min(width/(nodes.stream().mapToDouble(n->n.x).max().orElse(width)+2*offset),
+				       			height/(nodes.stream().mapToDouble(n->n.y).max().orElse(height)+2*offset));
+
+			System.out.println(offset+" "+scale);
+			for (var node: nodes){
+				node.rescale(-offset,scale);
+			}
+		}
 	}
 
 
-	private static final double WIDTH = 500;
-	private static final double HEIGHT = 500;
+	private static final double WIDTH = 1000;
+	private static final double HEIGHT = 1000;
 
 	public final Graph inputGraph;
 	public final List<DelaunayTriangle> delaunayTriangles;
@@ -259,37 +271,6 @@ public class LloydStep {
 		this.inputGraph = inputGraph;
 
 		delaunayTriangles = computeDelaunayTriangulation(inputGraph.nodes);
-
-
-		var minX = Math.min(
-				inputGraph.nodes.stream().mapToDouble(n->n.x).min().orElse(WIDTH),
-				delaunayTriangles.stream().mapToDouble(t->t.getCircumCircle().center.x).min().orElse(WIDTH));
-		var minY = Math.min(
-				inputGraph.nodes.stream().mapToDouble(n->n.y).min().orElse(HEIGHT),
-				delaunayTriangles.stream().mapToDouble(t->t.getCircumCircle().center.y).min().orElse(HEIGHT));
-
-		//if coordinates are too small scale offset
-		if (minX<0 || minY<0){
-			var offset = Math.min(minY,minX);
-//			System.out.println("offset: "+offset);
-			inputGraph.nodes.stream().forEach(n->n.rescale(offset,1));
-			delaunayTriangles.stream().forEach(t->t.getCircumCircle().center.rescale(offset,1));
-		}
-
-		var maxX = Math.max(
-				inputGraph.nodes.stream().mapToDouble(n->n.x).min().orElse(WIDTH),
-				delaunayTriangles.stream().mapToDouble(t->t.getCircumCircle().center.x).max().orElse(WIDTH));
-		var maxY = Math.max(
-				inputGraph.nodes.stream().mapToDouble(n->n.y).min().orElse(HEIGHT),
-				delaunayTriangles.stream().mapToDouble(t->t.getCircumCircle().center.y).max().orElse(HEIGHT));
-
-		//if coordinates are too big scale down
-		if (maxX>WIDTH || maxY>HEIGHT){
-			var scaling = Math.min((WIDTH*0.9)/maxX,(HEIGHT*0.9)/maxY);
-//			System.out.println("scaling: "+scaling);
-			inputGraph.nodes.stream().forEach(n->n.rescale(0,scaling));
-			delaunayTriangles.stream().forEach(t->t.getCircumCircle().center.rescale(0,scaling));
-		}
 
 		// compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
@@ -365,13 +346,13 @@ public class LloydStep {
 				var br=new Node("bl",WIDTH, HEIGHT);
 				Node corner = null;
 
-				if (Math.abs(start.x)<0.01 || Math.abs(end.x)<0.01) //left side
-					if (Math.abs(start.y)<0.01 || Math.abs(end.y)<0.01) //top side
+				if (start.x<0.01 || end.x<0.01) //left side
+					if (start.y<0.01 || end.y<0.01) //top side
 						corner=tl;
 					else //bottom side
 						corner=bl;
 				else //right side
-					if (Math.abs(start.y)<0.01 || Math.abs(end.y)<0.01) //top side
+					if (start.y<0.01 || end.y<0.01) //top side
 						corner=tr;
 					else //bottom side
 						corner=br;

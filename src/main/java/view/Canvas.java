@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Canvas extends JPanel {
   double SCALING_CONST = 1;
-  double OFFSET_CONST = 20;
+  double OFFSET_CONST = 100;
 
   private LloydStep lloydStep;
   private LloydStep.Graph inputGraph;
@@ -46,20 +46,7 @@ public class Canvas extends JPanel {
 
   private void updateScaling(double width, double height) {
     double minCanvasSize = Math.min(width, height);
-    java.util.List<LloydStep.Node> nodes;
-    if (inputGraph != null) {
-      nodes = inputGraph.nodes;
-    } else if (lloydStep != null) {
-      nodes = lloydStep.inputGraph.nodes;
-    } else {
-      return;
-    }
-    double maxNodeCoord = Double.NEGATIVE_INFINITY;
-    for (LloydStep.Node n : nodes) {
-      if (n.x > maxNodeCoord) maxNodeCoord = n.x;
-      if (n.y > maxNodeCoord) maxNodeCoord = n.y;
-    }
-    SCALING_CONST = minCanvasSize / (maxNodeCoord + 4*OFFSET_CONST);
+    SCALING_CONST = minCanvasSize / (1000 + 4*OFFSET_CONST);
   }
 
   //source: https://stackoverflow.com/a/18565148/7421438
