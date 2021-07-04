@@ -96,12 +96,10 @@ public class Model {
     return lloydSteps;
   }
 
-  public LloydStep nextStep() {
-    if (index == lloydSteps.size() - 1) return lloydSteps.get(index);
+  public void nextStep() {
+    if (index == lloydSteps.size() - 1) return;
     index++;
-    var step = lloydSteps.get(index);
     updateViews();
-    return step;
   }
 
   public void nextStepOrSubstep() {
@@ -117,24 +115,17 @@ public class Model {
         nextStep();
       }
       substepOptions.get(substepIndex).forEach(this::setDisplayOption);
-      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
     } else {
       substepIndex = 0;
       nextStep();
     }
     updateViews();
-    System.out.println("Step: " + index + " Substep: " + substepIndex);
-    System.out.println();
   }
 
-  public LloydStep previousStep() {
-    if (index == -1) return lloydSteps.get(0);
+  public void previousStep() {
+    if (index == -1) return;
     index--;
     updateViews();
-    if (index < 0) {
-      return lloydSteps.get(0);
-    }
-    return lloydSteps.get(index);
   }
 
   public void previousStepOrSubstep() {
@@ -150,14 +141,11 @@ public class Model {
         previousStep();
       }
       substepOptions.get(substepIndex).forEach(this::setDisplayOption);
-      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
     } else {
       substepIndex = 0;
       previousStep();
     }
     updateViews();
-    System.out.println("Step: " + index + " Substep: " + substepIndex);
-    System.out.println();
   }
 
   public void firstStep() {
@@ -259,8 +247,6 @@ public class Model {
     }
     updateViews();
   }
-
-//  public static final String[] DISPLAY_OPTIONS={"Graph Nodes", "Graph Edges", "Delaunay Edges", "Voronoi Edges", "Voronoi Nodes", "Voronoi Centroids", "Enable Substeps"};
 
   public Map<DisplayOptions, Boolean> getDisplayOptions() {
     return displayOptions;
