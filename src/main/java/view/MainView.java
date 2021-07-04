@@ -9,6 +9,7 @@ public class MainView extends JFrame implements View {
 
   private final Canvas canvas;
 
+  private final Header header;
   private final FileControl fileControl;
   private final view.DisplayOptions displayOptions;
   private final AnimationControl animationControl;
@@ -19,11 +20,9 @@ public class MainView extends JFrame implements View {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
     // TODO: header or no header?
-//    JPanel header = new JPanel();
-//    JLabel headline = new JLabel("Voronoi Layout Visualization");
-//    headline.setFont(new Font("Arial", Font.PLAIN, 30));
-//    header.add(headline);
-//    add(header, BorderLayout.NORTH);
+
+    header = new Header();
+    add(header, BorderLayout.NORTH);
 
     canvas = new Canvas();
     canvas.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -60,6 +59,7 @@ public class MainView extends JFrame implements View {
   @Override
   public void update() {
     Model model = Model.INSTANCE;
+    header.update();
     animationControl.update();
     fileControl.update();
 

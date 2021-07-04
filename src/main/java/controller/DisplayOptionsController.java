@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 public class DisplayOptionsController implements ActionListener {
 
-    private DisplayOptions option;
+    private final DisplayOptions option;
 
     public DisplayOptionsController(DisplayOptions option) {
         this.option = option;

@@ -145,6 +145,7 @@ public class Model {
       substepIndex = 0;
       previousStep();
     }
+    if (index < 0) substepIndex = 0;
     updateViews();
   }
 
@@ -156,7 +157,7 @@ public class Model {
 
   public void lastStep() {
     index=lloydSteps.size()-1;
-    substepIndex = 0;
+    substepIndex = substepOptions.size()-1;
     updateViews();
   }
 
@@ -264,52 +265,75 @@ public class Model {
   private final List<Map<DisplayOptions, Boolean>> substepOptions = Arrays.asList(
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, true,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, false,
                   DisplayOptions.VORONOI_EDGES, false,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, false,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
                   DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes and edges
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, false,
                   DisplayOptions.VORONOI_EDGES, false,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, false,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
                   DisplayOptions.ENABLE_SUBSTEPS, true), // nodes
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, true,
+                  DisplayOptions.DELAUNAY_EDGES, false,
+                  DisplayOptions.VORONOI_EDGES, false,
+                  DisplayOptions.VORONOI_NODES, false,
+                  DisplayOptions.VORONOI_CENTROIDS, false,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
+                  DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes and delaunay circles
+          Map.of(DisplayOptions.GRAPH_NODES, true,
+                  DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, true,
                   DisplayOptions.DELAUNAY_EDGES, true,
                   DisplayOptions.VORONOI_EDGES, false,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, false,
-                  DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes and delaunay edges
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
+                  DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes, delaunay circles and delaunay edges
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, true,
                   DisplayOptions.VORONOI_EDGES, true,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, false,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
                   DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, delaunay edges and voronoi edges
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, false,
                   DisplayOptions.VORONOI_EDGES, true,
                   DisplayOptions.VORONOI_NODES, true,
                   DisplayOptions.VORONOI_CENTROIDS, false,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
                   DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, voronoi edges and voronoi nodes
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, false,
                   DisplayOptions.VORONOI_EDGES, true,
                   DisplayOptions.VORONOI_NODES, true,
                   DisplayOptions.VORONOI_CENTROIDS, true,
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
                   DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, voronoi edges, voronoi nodes and voronoi centroids
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
                   DisplayOptions.DELAUNAY_EDGES, false,
                   DisplayOptions.VORONOI_EDGES, false,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, true,
-                  DisplayOptions.ENABLE_SUBSTEPS, true) // nodes and voronoi centroids
+                  DisplayOptions.SHOW_NODE_DISPLACEMENT, true,
+                  DisplayOptions.ENABLE_SUBSTEPS, true) // nodes, voronoi centroids and displacement arrows
   );
 }

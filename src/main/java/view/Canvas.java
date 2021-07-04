@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.util.Map;
 
 public class Canvas extends JPanel {
@@ -91,12 +93,16 @@ public class Canvas extends JPanel {
       drawVoronoiCentroids(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.GRAPH_NODES,false))
       drawNodes(g2d, lloydStep.inputGraph);
+    if (displayOptions.getOrDefault(DisplayOptions.DELAUNAY_CIRCLES, false))
+      drawDelaunayCircles(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.DELAUNAY_EDGES,false))
-      drawDelaunyTriangles(g2d);
+      drawDelaunayTriangles(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.VORONOI_EDGES,false))
       drawVoronoiEdges(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.VORONOI_NODES,false))
       drawVoronoiNodes(g2d);
+    if (displayOptions.getOrDefault(DisplayOptions.SHOW_NODE_DISPLACEMENT, false))
+      drawNodeDisplacement(g2d);
     g2d.setStroke(new BasicStroke(2));
     if (displayOptions.getOrDefault(DisplayOptions.GRAPH_EDGES,false))
       drawEdges(g2d, lloydStep.inputGraph);
@@ -119,7 +125,15 @@ public class Canvas extends JPanel {
     }
   }
 
-  private void drawDelaunyTriangles(Graphics2D g2d) {
+  private void drawDelaunayCircles(Graphics2D g2d) {
+    for (var triangle : lloydStep.delaunayTriangles) {
+      LloydStep.DelaunayTriangle.Circle circle = triangle.getCircumCircle();
+      g2d.setColor(Color.GREEN);
+      g2d.drawOval((int) ((circle.center.x - circle.radius) * SCALING_CONST + OFFSET_CONST), (int) ((circle.center.y - circle.radius) * SCALING_CONST + OFFSET_CONST), (int) (2*circle.radius*SCALING_CONST), (int) (2*circle.radius*SCALING_CONST));
+    }
+  }
+
+  private void drawDelaunayTriangles(Graphics2D g2d) {
     for (var triangle : lloydStep.delaunayTriangles) {
       for (var edge : triangle.edges) {
         g2d.setColor(Color.ORANGE);
@@ -157,6 +171,30 @@ public class Canvas extends JPanel {
       var centroid = cell.getCentroid();
       g2d.setColor(Color.CYAN);
       drawOval(Color.CYAN,centroid.x,centroid.y,14,g2d);
+    }
+  }
+
+  private void drawNodeDisplacement(Graphics2D g2d) {
+    for (var node : lloydStep.inputGraph.nodes) {
+      var centroid = lloydStep.getVoronoiCellForNode(node).getCentroid();
+      int x1 = (int) (node.x*SCALING_CONST+OFFSET_CONST);
+      int y1 = (int) (node.y*SCALING_CONST+OFFSET_CONST);
+      int x2 = (int) (centroid.x*SCALING_CONST+OFFSET_CONST);
+      int y2 = (int) (centroid.y*SCALING_CONST+OFFSET_CONST);
+      g2d.drawLine(x1, y1, x2, y2);
+      Polygon arrowHead = new Polygon();
+      arrowHead.addPoint(0,5);
+      arrowHead.addPoint(-5, -5);
+      arrowHead.addPoint(5, -5);
+      AffineTransform t = new AffineTransform();
+      t.setToIdentity();
+      t.translate(x2, y2);
+      double angle = Math.atan2(y2-y1, x2-x1);
+      t.rotate(angle - Math.PI / 2d);
+      AffineTransform before = g2d.getTransform();
+      g2d.setTransform(t);
+      g2d.fill(arrowHead);
+      g2d.setTransform(before);
     }
   }
 

@@ -27,9 +27,18 @@ public class DisplayOptions extends JPanel implements View {
     }
 
     public void update() {
-        Model model = Model.INSTANCE;
+        Model m = Model.INSTANCE;
         displayOptionCheckboxes.forEach(
-                (option, checkbox) -> checkbox.setSelected(model.getDisplayOptions().getOrDefault(option, false))
+                (option, checkbox) -> {
+                    checkbox.setSelected(m.getDisplayOptions().getOrDefault(option, false));
+                    if (!option.equals(model.DisplayOptions.ENABLE_SUBSTEPS)) {
+                        if (m.getDisplayOptions().getOrDefault(model.DisplayOptions.ENABLE_SUBSTEPS, false)) {
+                            checkbox.setEnabled(false); // disable other options when substeps are enabled
+                        } else {
+                            checkbox.setEnabled(true); // enable again when substeps are disabled
+                        }
+                    }
+                }
         );
     }
 }

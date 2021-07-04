@@ -93,6 +93,7 @@ public class AnimationControl extends JPanel implements View {
         if (model.getLloydSteps()!=null && model.getInputGraph()!=null) {
             if (model.getLloydSteps().size() == 0 || model.getIndex() < 0){
                 step.setText("<html>Input Graph<br>(after force-directed layout)</html>");
+                substep.setText("");
             } else{
                 step.setText("Step " + model.getIndex() + "/" + (model.getLloydSteps().size() - 1));
                 if (model.getDisplayOptions().getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
