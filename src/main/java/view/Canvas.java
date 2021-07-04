@@ -1,6 +1,7 @@
 package view;
 
 import algorithm.LloydStep;
+import model.DisplayOptions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,11 +12,10 @@ import java.util.Map;
 public class Canvas extends JPanel {
   double SCALING_CONST = 1;
   double OFFSET_CONST = 20;
-  double PADDING = 20;
 
   private LloydStep lloydStep;
   private LloydStep.Graph inputGraph;
-  private Map<String, Boolean> displayOptions;
+  private Map<DisplayOptions, Boolean> displayOptions;
 
   public Canvas() {
     super();
@@ -28,7 +28,7 @@ public class Canvas extends JPanel {
     });
   }
 
-  public void update(LloydStep lloydStep, Map<String,Boolean> displayOptions) {
+  public void update(LloydStep lloydStep, Map<DisplayOptions,Boolean> displayOptions) {
     this.lloydStep = lloydStep;
     this.inputGraph = null;
     this.displayOptions=displayOptions;
@@ -36,7 +36,7 @@ public class Canvas extends JPanel {
     repaint();
   }
 
-  public void update(LloydStep.Graph graph, Map<String,Boolean> displayOptions) {
+  public void update(LloydStep.Graph graph, Map<DisplayOptions,Boolean> displayOptions) {
     this.inputGraph = graph;
     this.lloydStep = null;
     this.displayOptions=displayOptions;
@@ -100,18 +100,18 @@ public class Canvas extends JPanel {
       return;
     }
 
-    if (displayOptions.getOrDefault("Voronoi Centroids",false))
+    if (displayOptions.getOrDefault(DisplayOptions.VORONOI_CENTROIDS, false))
       drawVoronoiCentroids(g2d);
-    if (displayOptions.getOrDefault("Graph Nodes",false))
+    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_NODES,false))
       drawNodes(g2d, lloydStep.inputGraph);
-    if (displayOptions.getOrDefault("Delaunay Edges",false))
+    if (displayOptions.getOrDefault(DisplayOptions.DELAUNAY_EDGES,false))
       drawDelaunyTriangles(g2d);
-    if (displayOptions.getOrDefault("Voronoi Edges",false))
+    if (displayOptions.getOrDefault(DisplayOptions.VORONOI_EDGES,false))
       drawVoronoiEdges(g2d);
-    if (displayOptions.getOrDefault("Voronoi Nodes",false))
+    if (displayOptions.getOrDefault(DisplayOptions.VORONOI_NODES,false))
       drawVoronoiNodes(g2d);
     g2d.setStroke(new BasicStroke(2));
-    if (displayOptions.getOrDefault("Graph Edges",false))
+    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_EDGES,false))
       drawEdges(g2d, lloydStep.inputGraph);
   }
 

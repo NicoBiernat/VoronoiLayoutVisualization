@@ -1,5 +1,6 @@
 package controller;
 
+import model.DisplayOptions;
 import model.Model;
 
 import javax.swing.*;
@@ -79,7 +80,7 @@ public class Controller implements MouseListener, ActionListener {
 
   public void stepSliderChanged(int newStep) { model.setStep(newStep);}
 
-  public void setDisplayOption(String option,boolean value) {
+  public void setDisplayOption(DisplayOptions option, boolean value) {
     model.setDisplayOption(option,value);
   }
 }
