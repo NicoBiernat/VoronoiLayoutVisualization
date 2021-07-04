@@ -32,6 +32,9 @@ public class Header extends JPanel implements View {
         Model model = Model.INSTANCE;
         if (model.getDisplayOptions().getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) {
             headline.setText(explanations[model.getSubstepIndex()]);
+            if (model.getIndex() == -1) {
+                headline.setText("Input graph (after force-directed layout)");
+            }
         } else {
             headline.setText("Voronoi Layout Visualization");
         }

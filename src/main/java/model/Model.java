@@ -167,7 +167,7 @@ public class Model {
   public void playSteps() {
     if (playingThread==null){
       playingThread = new Thread(() -> {
-        while (playingThread!=null && index<lloydSteps.size()-1){
+        while (playingThread!=null && (index < lloydSteps.size()-1 || substepIndex < substepOptions.size()-1)){
           nextStepOrSubstep();
           try {
             //TODO implement interpolation

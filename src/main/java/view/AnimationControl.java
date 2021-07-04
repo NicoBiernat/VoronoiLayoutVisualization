@@ -28,11 +28,17 @@ public class AnimationControl extends JPanel implements View {
         speedSlider.setValue(5);
 
         //Steps
-        JPanel stepContainer = new JPanel(new FlowLayout());
+        JPanel stepContainerContainer = new JPanel();
+        JPanel stepContainer = new JPanel();
+        stepContainer.setLayout(new BoxLayout(stepContainer, BoxLayout.Y_AXIS));
         step.setText("");
+        substep.setText("");
+        step.setFont(new Font("Arial", Font.PLAIN, 20));
+        substep.setFont(new Font("Arial", Font.PLAIN, 20));
         stepContainer.add(step);
         stepContainer.add(substep);
-        add(stepContainer);
+        stepContainerContainer.add(stepContainer);
+        add(stepContainerContainer);
 
         //Step control
         stepSlider.addChangeListener(new AnimationController.StepSliderController());
@@ -94,7 +100,7 @@ public class AnimationControl extends JPanel implements View {
             if (model.getLloydSteps().size() == 0 || model.getIndex() < 0){
                 step.setText("<html>Input Graph<br>(after force-directed layout)</html>");
                 substep.setText("");
-            } else{
+            } else {
                 step.setText("Step " + model.getIndex() + "/" + (model.getLloydSteps().size() - 1));
                 if (model.getDisplayOptions().getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
                     substep.setText("Substep " + model.getSubstepIndex() + "/" + (model.getNumSubsteps()-1));
