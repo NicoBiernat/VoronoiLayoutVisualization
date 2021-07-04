@@ -1,6 +1,5 @@
 package view;
 
-import controller.Controller;
 import model.Model;
 
 import javax.swing.*;
@@ -8,13 +7,13 @@ import java.awt.*;
 
 public class MainView extends JFrame implements View {
 
-  private Canvas canvas;
+  private final Canvas canvas;
 
-  private FileControl fileControl;
-  private view.DisplayOptions displayOptions;
-  private AnimationControl animationControl;
+  private final FileControl fileControl;
+  private final view.DisplayOptions displayOptions;
+  private final AnimationControl animationControl;
 
-  public MainView(Controller controller) {
+  public MainView() {
     setTitle("Voronoi Layout Visualization");
     setResizable(true);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,11 +40,11 @@ public class MainView extends JFrame implements View {
     labelContainer.add(navLabel);
     right.add(labelContainer);
 
-    fileControl = new FileControl(controller);
+    fileControl = new FileControl();
     right.add(fileControl);
-    displayOptions = new view.DisplayOptions(controller, new DesignChooser(controller, this));
+    displayOptions = new view.DisplayOptions(new DesignChooser(this));
     right.add(displayOptions);
-    animationControl = new AnimationControl(controller);
+    animationControl = new AnimationControl();
     right.add(animationControl);
 
     //basically margin:10
@@ -59,12 +58,13 @@ public class MainView extends JFrame implements View {
   }
 
   @Override
-  public void update(Model model) {
-    animationControl.update(model);
-    fileControl.update(model);
+  public void update() {
+    Model model = Model.INSTANCE;
+    animationControl.update();
+    fileControl.update();
 
     if (model.getLloydSteps()!=null && model.getInputGraph()!=null) {
-      displayOptions.update(model);
+      displayOptions.update();
       if (model.getLloydSteps().size() == 0 || model.getIndex() < 0){
         canvas.update(model.getInputGraph(),model.getDisplayOptions());
       } else{

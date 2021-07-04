@@ -1,24 +1,11 @@
 package main;
 
-import controller.Controller;
 import model.Model;
-import org.eclipse.elk.alg.force.ForceLayoutProvider;
-import org.eclipse.elk.alg.force.options.ForceMetaDataProvider;
-import org.eclipse.elk.alg.force.options.ForceModelStrategy;
-import org.eclipse.elk.alg.force.options.ForceOptions;
-import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
-import org.eclipse.elk.core.options.CoreOptions;
-import org.eclipse.elk.core.util.BasicProgressMonitor;
-import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import org.eclipse.elk.graph.util.ElkGraphUtil;
 
-import algorithm.LloydRelaxation;
-import parser.Parser;
 import view.MainView;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 
@@ -29,9 +16,8 @@ public class Main {
   public static void main(String[] args) {
 
     System.out.println("Creating MVC");
-    Model model = new Model(null, null);
-    Controller controller = new Controller(model);
-    MainView view = new MainView(controller);
+    Model model = Model.INSTANCE;
+    MainView view = new MainView();
     model.registerView(view);
   }
 

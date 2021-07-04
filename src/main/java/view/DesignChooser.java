@@ -1,13 +1,12 @@
 package view;
 
-import controller.Controller;
-import model.Model;
+import controller.DesignChooserController;
 
 import javax.swing.*;
 
 public class DesignChooser extends JPanel implements View {
 
-    public DesignChooser(Controller controller, JFrame root) {
+    public DesignChooser(JFrame root) {
         UIManager.LookAndFeelInfo[] lookAndFeelInfos = UIManager.getInstalledLookAndFeels();
         String[] designOptions = new String[lookAndFeelInfos.length];
         for (int i = 0; i < designOptions.length; i++) {
@@ -15,21 +14,13 @@ public class DesignChooser extends JPanel implements View {
         }
         JComboBox<String> designChooser = new JComboBox<>(designOptions);
         designChooser.setVisible(true);
-        designChooser.addActionListener(actionEvent -> { // TODO: move to controller
-            UIManager.LookAndFeelInfo info = lookAndFeelInfos[designChooser.getSelectedIndex()];
-            try {
-                UIManager.setLookAndFeel(info.getClassName());
-            } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
-            }
-            SwingUtilities.updateComponentTreeUI(root);
-        });
+        designChooser.addActionListener(new DesignChooserController(lookAndFeelInfos, root));
         add(new JLabel("UI Design: "));
         add(designChooser);
     }
 
     @Override
-    public void update(Model model) {
+    public void update() {
         // nothing to do here
     }
 }

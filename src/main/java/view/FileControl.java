@@ -1,55 +1,32 @@
 package view;
 
-import controller.Controller;
+import controller.FileController;
 import model.Model;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.io.File;
 
 public class FileControl extends JPanel {
 
     private final JLabel selectedFile = new JLabel();
 
-    public FileControl(Controller controller) {
+    public FileControl() {
         selectedFile.setFont(new Font("Arial", Font.PLAIN, 14));
         add(selectedFile);
 
-        JButton openFileBtn = new JButton("open file");
-        // TODO: move to controller:
-        openFileBtn.addActionListener(e -> {
-            JFileChooser chooser = new JFileChooser(new File(System.getProperty("user.dir")));
-            chooser.setFileFilter(new FileFilter() {
-                public String getDescription() {
-                    return "ELKT files (*.elkt)";
-                }
-
-                public boolean accept(File f) {
-                    if (f.isDirectory()) {
-                        return true;
-                    } else {
-                        String filename = f.getName().toLowerCase();
-                        return filename.endsWith(".elkt");
-                    }
-                }
-            });
-            if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File f = chooser.getSelectedFile();
-                controller.fileSelected(f);
-            } else {
-                //cancelled, do nothing
-            }
-        });
+        JButton openFileBtn = new JButton("Open file");
+        openFileBtn.addActionListener(new FileController(this));
         add(openFileBtn);
         setBorder(BorderFactory.createTitledBorder("File Control"));
     }
 
-    public void update(Model model) {
-        if (model.getSelectedFile()==null)
+    public void update() {
+        Model model = Model.INSTANCE;
+        if (model.getSelectedFile()==null) {
             selectedFile.setText("none yet");
-        else
-            selectedFile.setText(pathLengthShortener(model.getSelectedFile().getPath(),20));
+        } else {
+            selectedFile.setText(pathLengthShortener(model.getSelectedFile().getPath(), 20));
+        }
     }
 
     /**

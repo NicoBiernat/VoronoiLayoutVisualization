@@ -1,6 +1,6 @@
 package view;
 
-import controller.Controller;
+import controller.DisplayOptionsController;
 import model.Model;
 
 import javax.swing.*;
@@ -11,14 +11,14 @@ public class DisplayOptions extends JPanel implements View {
 
     private final Map<model.DisplayOptions,JCheckBox> displayOptionCheckboxes = new HashMap<>();
 
-    public DisplayOptions(Controller controller, DesignChooser designChooser) {
+    public DisplayOptions(DesignChooser designChooser) {
         var internalDisplayOptionsPanel = new JPanel();
         internalDisplayOptionsPanel.setLayout(new BoxLayout(internalDisplayOptionsPanel, BoxLayout.Y_AXIS));
         internalDisplayOptionsPanel.add(designChooser);
 
         for (var option : model.DisplayOptions.values()){
             var optionCheckbox = new JCheckBox(option.toString(),true);
-            optionCheckbox.addActionListener(e->controller.setDisplayOption(option,((JCheckBox)e.getSource()).isSelected()));
+            optionCheckbox.addActionListener(new DisplayOptionsController(option));
             displayOptionCheckboxes.put(option,optionCheckbox);
             internalDisplayOptionsPanel.add(optionCheckbox);
         }
@@ -26,7 +26,10 @@ public class DisplayOptions extends JPanel implements View {
         add(internalDisplayOptionsPanel);
     }
 
-    public void update(Model model) {
-        displayOptionCheckboxes.forEach((option, checkbox) -> checkbox.setSelected(model.getDisplayOptions().getOrDefault(option, false)));
+    public void update() {
+        Model model = Model.INSTANCE;
+        displayOptionCheckboxes.forEach(
+                (option, checkbox) -> checkbox.setSelected(model.getDisplayOptions().getOrDefault(option, false))
+        );
     }
 }

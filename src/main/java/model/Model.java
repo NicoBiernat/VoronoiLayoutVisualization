@@ -5,10 +5,8 @@ import algorithm.LloydStep;
 import org.eclipse.elk.alg.force.options.ForceMetaDataProvider;
 import org.eclipse.elk.alg.force.options.ForceOptions;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
-import org.eclipse.elk.core.math.KVector;
 import org.eclipse.elk.core.options.CoreOptions;
 import org.eclipse.elk.core.util.BasicProgressMonitor;
-import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import parser.Parser;
 import view.View;
@@ -19,7 +17,7 @@ import java.util.*;
 
 public class Model {
 
-
+  public static final Model INSTANCE = new Model(null, null);
 
   private File selectedFile;
 
@@ -35,7 +33,7 @@ public class Model {
     return selectedFile;
   }
 
-  public Model(List<LloydStep> lloydSteps, LloydStep.Graph inputGraph) {
+  private Model(List<LloydStep> lloydSteps, LloydStep.Graph inputGraph) {
     this.lloydSteps = lloydSteps;
     this.inputGraph = inputGraph;
   }
@@ -84,11 +82,11 @@ public class Model {
 
   public void registerView(View v) {
     views.add(v);
-    v.update(this);
+    v.update();
   }
 
   public void updateViews() {
-    views.forEach(v -> v.update(this));
+    views.forEach(View::update);
   }
 
   public List<LloydStep> getLloydSteps() {
@@ -230,7 +228,7 @@ public class Model {
     updateViews();
   }
 
-  private Map<DisplayOptions,Boolean> displayOptions = new HashMap<>();
+  private final Map<DisplayOptions,Boolean> displayOptions = new HashMap<>();
   public void setDisplayOption(DisplayOptions option, boolean value) {
     displayOptions.put(option,value);
     updateViews();

@@ -1,0 +1,70 @@
+package controller;
+
+import model.Model;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class AnimationController {
+
+    public static class SpeedSliderController implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent changeEvent) {
+            int newValue = ((JSlider) changeEvent.getSource()).getValue();
+            Model.INSTANCE.setPlaybackSpeed(1000 / ( newValue + 1));
+        }
+    }
+
+    public static class StepSliderController implements ChangeListener {
+        @Override
+        public void stateChanged(ChangeEvent changeEvent) {
+            Model.INSTANCE.setStep(((JSlider) changeEvent.getSource()).getValue());
+        }
+    }
+
+    public static class StepForwardController implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Model.INSTANCE.nextStepOrSubstep();
+        }
+    }
+
+    public static class StepBackwardController implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Model.INSTANCE.previousStepOrSubstep();
+        }
+    }
+
+    public static class GotoStartController implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Model.INSTANCE.firstStep();
+        }
+    }
+
+    public static class GotoEndController implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            Model.INSTANCE.lastStep();
+        }
+    }
+
+    public static class PlayPauseController implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            switch (actionEvent.getActionCommand()) {
+                case "play":
+                    Model.INSTANCE.playSteps();
+                    break;
+                case "pause":
+                    Model.INSTANCE.pauseSteps();
+                    break;
+            }
+        }
+    }
+
+}

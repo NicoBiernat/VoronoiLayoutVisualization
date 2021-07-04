@@ -1,6 +1,6 @@
 package view;
 
-import controller.Controller;
+import controller.AnimationController;
 import model.DisplayOptions;
 import model.Model;
 
@@ -9,20 +9,18 @@ import java.awt.*;
 
 public class AnimationControl extends JPanel implements View {
 
-    private JLabel step = new JLabel();
-    private JLabel substep = new JLabel();
-    private JSlider stepSlider = new JSlider();
-    private JButton playPauseButton;
+    private final JLabel step = new JLabel();
+    private final JLabel substep = new JLabel();
+    private final JSlider stepSlider = new JSlider();
+    private final JButton playPauseButton;
 
-    public AnimationControl(Controller controller) {
+    public AnimationControl() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         //Speed control
         JPanel speedSliderContainer = new JPanel(new FlowLayout());
         JSlider speedSlider = new JSlider();
-        speedSlider.addChangeListener(e -> {
-            controller.speedSliderChanged(((JSlider)e.getSource()).getValue());
-        });
+        speedSlider.addChangeListener(new AnimationController.SpeedSliderController());
         JLabel speedSliderLabel = new JLabel("Speed");
         speedSliderContainer.add(speedSliderLabel);
         speedSliderContainer.add(speedSlider);
@@ -37,9 +35,7 @@ public class AnimationControl extends JPanel implements View {
         add(stepContainer);
 
         //Step control
-        stepSlider.addChangeListener(e -> {
-            controller.stepSliderChanged(((JSlider)e.getSource()).getValue());
-        });
+        stepSlider.addChangeListener(new AnimationController.StepSliderController());
         stepSlider.setMinimum(-1);
         stepSlider.setValue(-1);
         add(stepSlider);
@@ -52,8 +48,8 @@ public class AnimationControl extends JPanel implements View {
         JButton stepForward = new JButton("||>");
         stepForward.setText("\u23E9");
         stepForward.setActionCommand("||>");
-        stepForward.addActionListener(controller);
-        stepBackward.addActionListener(controller);
+        stepForward.addActionListener(new AnimationController.StepForwardController());
+        stepBackward.addActionListener(new AnimationController.StepBackwardController());
 
         var gotoStart = new JButton("|<<");
         gotoStart.setText("\u23EE");
@@ -61,10 +57,10 @@ public class AnimationControl extends JPanel implements View {
         var gotoEnd = new JButton(">>|");
         gotoEnd.setText("\u23ED");
         gotoEnd.setActionCommand(">>|");
-        playPauseButton = new JButton("|>");
-        gotoStart.addActionListener(controller);
-        gotoEnd.addActionListener(controller);
-        playPauseButton.addActionListener(controller);
+        playPauseButton = new JButton("play");
+        gotoStart.addActionListener(new AnimationController.GotoStartController());
+        gotoEnd.addActionListener(new AnimationController.GotoEndController());
+        playPauseButton.addActionListener(new AnimationController.PlayPauseController());
 
         playbackContainer.add(gotoStart);
         playbackContainer.add(stepBackward);
@@ -78,12 +74,13 @@ public class AnimationControl extends JPanel implements View {
     }
 
     @Override
-    public void update(Model model) {
+    public void update() {
+        Model model = Model.INSTANCE;
         if (model.isPlayingSteps()){
-            playPauseButton.setActionCommand("||");
+            playPauseButton.setActionCommand("pause");
             playPauseButton.setText("\u23F8");
         } else {
-            playPauseButton.setActionCommand("|>");
+            playPauseButton.setActionCommand("play");
             playPauseButton.setText("\u25B6");
         }
 
