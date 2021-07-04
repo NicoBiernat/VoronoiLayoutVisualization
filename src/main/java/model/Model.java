@@ -105,21 +105,26 @@ public class Model {
   }
 
   public void nextStepOrSubstep() {
-    if (index >= 0 && displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
-      substepIndex++;
-      if (substepIndex >= substepOptions.size()) {
+    if (displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
+      if (index >= 0) {
+        substepIndex++;
+        if (substepIndex >= substepOptions.size()) {
+          substepIndex = index < lloydSteps.size() - 1 ? 0 : substepOptions.size() - 1;
+          nextStep();
+        }
+      } else {
         substepIndex = 0;
         nextStep();
       }
       substepOptions.get(substepIndex).forEach(this::setDisplayOption);
-//      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
+      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
     } else {
       substepIndex = 0;
       nextStep();
     }
     updateViews();
-//    System.out.println("Step: " + index + " Substep: " + substepIndex);
-//    System.out.println();
+    System.out.println("Step: " + index + " Substep: " + substepIndex);
+    System.out.println();
   }
 
   public LloydStep previousStep() {
@@ -133,21 +138,26 @@ public class Model {
   }
 
   public void previousStepOrSubstep() {
-    if (index >= 0 && displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
-      substepIndex--;
-      if (substepIndex < 0) {
+    if (displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
+      if (index >= 0) {
+        substepIndex--;
+        if (substepIndex < 0) {
+          substepIndex = substepOptions.size() - 1;
+          previousStep();
+        }
+      } else {
         substepIndex = substepOptions.size() - 1;
         previousStep();
       }
       substepOptions.get(substepIndex).forEach(this::setDisplayOption);
-//      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
+      displayOptions.forEach((option, enabled) -> System.out.println(option + ": " + enabled));
     } else {
       substepIndex = 0;
       previousStep();
     }
     updateViews();
-//    System.out.println("Step: " + index + " Substep: " + substepIndex);
-//    System.out.println();
+    System.out.println("Step: " + index + " Substep: " + substepIndex);
+    System.out.println();
   }
 
   public void firstStep() {
@@ -234,6 +244,19 @@ public class Model {
   private final Map<DisplayOptions,Boolean> displayOptions = new HashMap<>();
   public void setDisplayOption(DisplayOptions option, boolean value) {
     displayOptions.put(option,value);
+
+    // enabling/disabling substeps enables/disables other options
+    if (option.equals(DisplayOptions.ENABLE_SUBSTEPS)) {
+      if (value) { // enabled -> enable options of substep
+        substepOptions.get(substepIndex).entrySet().stream()
+                .filter(e -> !e.getKey().equals(DisplayOptions.ENABLE_SUBSTEPS))
+                .forEach(e -> setDisplayOption(e.getKey(), e.getValue()));
+      } else { // disabled -> enable all options
+        Arrays.stream(DisplayOptions.values())
+                .filter(o -> !o.equals(DisplayOptions.ENABLE_SUBSTEPS))
+                .forEach(o -> setDisplayOption(o, true));
+      }
+    }
     updateViews();
   }
 
