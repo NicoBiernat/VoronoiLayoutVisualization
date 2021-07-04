@@ -11,14 +11,14 @@ import java.util.Random;
 
 public class Main {
 
-  private static final String FILE_NAME = "TestGraph.elkt";
-
   public static void main(String[] args) {
 
     System.out.println("Creating MVC");
     Model model = Model.INSTANCE;
     MainView view = new MainView();
     model.registerView(view);
+    //FIXME: dev override
+    model.loadGraph(generateRandomGraph(17,100,new Random(8)));
   }
 
   public static ElkNode generateRandomGraph(int numNodes, int numEdges, Random rnd) {
