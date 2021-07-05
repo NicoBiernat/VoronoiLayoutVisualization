@@ -278,13 +278,7 @@ public class LloydStep {
 			for (var triangle : delaunayTriangles)
 				if (triangle.edges.stream().anyMatch(e -> e.equals(delaunayEdge, false)))
 					adjacentTriangles.add(triangle);
-			if (adjacentTriangles.size() == 2) {
-				// simple case 2 adjacent triangles add line from adjacent circumCenters
-				var voronoiEdge = new Edge(adjacentTriangles.get(0).getCircumCircle().center,
-						adjacentTriangles.get(1).getCircumCircle().center);
-				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
-				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
-			} else if (adjacentTriangles.size() == 1) {
+			if (adjacentTriangles.size() == 1) {
 				var circumCenter = adjacentTriangles.get(0).getCircumCircle().center;
 
 				var dx = delaunayEdge.from.x - delaunayEdge.to.x;
@@ -323,8 +317,11 @@ public class LloydStep {
 				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
 				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
 			} else {
-				throw new IllegalStateException("Delaunay Edge " + delaunayEdge + " has " + adjacentTriangles.size()
-						+ " triangles: " + adjacentTriangles);
+				// simple case 2 adjacent triangles add line from adjacent circumCenters
+				var voronoiEdge = new Edge(adjacentTriangles.get(0).getCircumCircle().center,
+						adjacentTriangles.get(1).getCircumCircle().center);
+				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
+				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
 			}
 		}
 		//close open voronoi cells, that have been clipped
@@ -360,6 +357,9 @@ public class LloydStep {
 				cell.edges.add(new Edge(start,corner));
 				cell.edges.add(new Edge(corner,end));
 			}
+		}
+		for (var cell : voronoiCells) {
+			SutherlandHodgmanClipping.clip(cell, 0, 0, WIDTH, HEIGHT);
 		}
 	}
 
