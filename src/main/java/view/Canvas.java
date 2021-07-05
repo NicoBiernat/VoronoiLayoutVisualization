@@ -123,7 +123,7 @@ public class Canvas extends JPanel {
 
   private void drawEdges(Graphics2D g2d, LloydStep.Graph graph) {
     for (var edge : graph.edges) {
-      g2d.setColor(Color.GRAY);
+      g2d.setColor(Color.LIGHT_GRAY);
       g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
     }
   }
