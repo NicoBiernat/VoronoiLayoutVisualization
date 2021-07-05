@@ -31,11 +31,15 @@ public class DisplayOptions extends JPanel implements View {
         displayOptionCheckboxes.forEach(
                 (option, checkbox) -> {
                     checkbox.setSelected(m.getDisplayOptions().getOrDefault(option, false));
-                    if (!option.equals(model.DisplayOptions.ENABLE_SUBSTEPS)) {
-                        if (m.getDisplayOptions().getOrDefault(model.DisplayOptions.ENABLE_SUBSTEPS, false)) {
-                            checkbox.setEnabled(false); // disable other options when substeps are enabled
+                    if (m.getIndex() < 0) {
+                        checkbox.setEnabled(option.equals(model.DisplayOptions.GRAPH_NODES) || option.equals(model.DisplayOptions.GRAPH_EDGES));
+                    } else {
+                        if (!option.equals(model.DisplayOptions.ENABLE_SUBSTEPS)) {
+                            boolean substepsEnabled = m.getDisplayOptions().getOrDefault(model.DisplayOptions.ENABLE_SUBSTEPS, false);
+                            // enable again when substeps are disabled
+                            checkbox.setEnabled(!substepsEnabled); // disable other options when substeps are enabled
                         } else {
-                            checkbox.setEnabled(true); // enable again when substeps are disabled
+                            checkbox.setEnabled(true);
                         }
                     }
                 }
