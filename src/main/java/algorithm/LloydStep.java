@@ -252,7 +252,7 @@ public class LloydStep {
 			var scale = Math.min(width/(nodes.stream().mapToDouble(n->n.x).max().orElse(width)+2*offset),
 				       			height/(nodes.stream().mapToDouble(n->n.y).max().orElse(height)+2*offset));
 
-			System.out.println(offset+" "+scale);
+//			System.out.println(offset+" "+scale);
 			for (var node: nodes){
 				node.rescale(-offset,scale);
 			}
