@@ -12,8 +12,6 @@ import java.util.Random;
 public class Main {
 
   public static void main(String[] args) {
-
-    System.out.println("Creating MVC");
     Model model = Model.INSTANCE;
     MainView view = new MainView();
     model.registerView(view);
