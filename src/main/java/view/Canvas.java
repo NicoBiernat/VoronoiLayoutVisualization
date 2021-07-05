@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.util.Map;
+import java.util.Random;
 
 public class Canvas extends JPanel {
   double SCALING_CONST = 1;
@@ -162,13 +163,18 @@ public class Canvas extends JPanel {
   }
 
   private void drawVoronoiEdges(Graphics2D g2d) {
-    for (var cell : lloydStep.voronoiCells) {
-      for (var edge : cell.edges) {
-        g2d.setColor(Color.BLUE);
-        g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
-      }
-    }
-  }
+	    var width = lloydStep.voronoiCells.size()*2+1;
+	    for (var cell : lloydStep.voronoiCells) {
+	    	Color clr = Color.getHSBColor(width*0.28f % 1,1,0.75f);
+	      g2d.setStroke(new BasicStroke(width--));
+	      width--;
+	      for (var edge : cell.edges) {
+	        g2d.setColor(clr);
+	        g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
+	      }
+	    }
+	    g2d.setStroke(new BasicStroke(2));
+	  }
   private void drawVoronoiCentroids(Graphics2D g2d) {
     for (var cell : lloydStep.voronoiCells) {
       var centroid = cell.getCentroid();

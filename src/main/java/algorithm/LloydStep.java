@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -272,6 +273,7 @@ public class LloydStep {
 
 		delaunayTriangles = computeDelaunayTriangulation(inputGraph.nodes);
 
+		var outgoingEdges = new ArrayList<Edge>();
 		// compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
 			var adjacentTriangles = new ArrayList<DelaunayTriangle>();
@@ -316,6 +318,7 @@ public class LloydStep {
 				var voronoiEdge = new Edge(circumCenter, frameCrossing);
 				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
 				getVoronoiCellForNode(delaunayEdge.to).edges.add(voronoiEdge);
+				checkClipping(outgoingEdges, voronoiEdge);
 			} else {
 				// simple case 2 adjacent triangles add line from adjacent circumCenters
 				var voronoiEdge = new Edge(adjacentTriangles.get(0).getCircumCircle().center,
@@ -361,6 +364,82 @@ public class LloydStep {
 		for (var cell : voronoiCells) {
 			SutherlandHodgmanClipping.clip(cell, 0, 0, WIDTH, HEIGHT);
 		}
+	}
+	
+	public void checkClipping(ArrayList<Edge> edges, Edge newEdge) {
+		for (Iterator<Edge> i = edges.iterator(); i.hasNext();) {
+			Edge currentEdge = i.next();
+			if (Line2D.linesIntersect(newEdge.from.x, newEdge.from.y, newEdge.to.x, newEdge.to.y, currentEdge.from.x, currentEdge.from.y, currentEdge.to.x, currentEdge.to.y)) {
+				var dxNew = newEdge.from.x - newEdge.to.x;
+				var dyNew = newEdge.from.y - newEdge.to.y;
+				var dxCurrent = currentEdge.from.x - currentEdge.to.x;
+				var dyCurrent = currentEdge.from.y - currentEdge.to.y;
+				var lenNew = Math.sqrt(dxNew * dxNew + dyNew * dyNew);
+				var lenCurrent = Math.sqrt(dxCurrent * dxCurrent + dyCurrent * dyCurrent);
+				dxNew /= lenNew;
+				dyNew /= lenNew;
+				dxCurrent /= lenCurrent;
+				dyCurrent /= lenCurrent;
+				
+				
+				var x = ((currentEdge.from.x - newEdge.from.x) * dyCurrent - (currentEdge.from.y - newEdge.from.y) * dxCurrent) / (dxNew * dyCurrent - dyNew * dxCurrent);
+				var y = ((currentEdge.from.x - newEdge.from.x) * dyNew - (currentEdge.from.y - newEdge.from.y) * dxNew) / (dxNew * dyCurrent - dyNew * dxCurrent);
+				newEdge.to.x = newEdge.from.x + x * dxNew;
+				newEdge.to.y = newEdge.from.y + x * dyNew;
+				currentEdge.to.x = newEdge.to.x;
+				currentEdge.to.y = newEdge.to.y;
+				
+				edges.remove(currentEdge);
+				edges.remove(newEdge);
+				
+				var dxOutgoing = -dxNew - dxCurrent;
+				var dyOutgoing = -dyNew - dyCurrent;
+
+				if (dxOutgoing > 0) {
+					x = (WIDTH - newEdge.to.x) / dxOutgoing;
+				} else {
+					x = -(newEdge.to.x / dxOutgoing);
+				}
+				
+				if (dyOutgoing > 0) {
+					y = (HEIGHT - newEdge.to.y) / dyOutgoing;
+				} else {
+					y = -(newEdge.to.y / dyOutgoing);
+				}
+
+				if (Math.abs(x) < Math.abs(y)) {
+					dxOutgoing *= Math.abs(x);
+					dyOutgoing *= Math.abs(x);
+				} else {
+					dxOutgoing *= Math.abs(y);
+					dyOutgoing *= Math.abs(y);
+				}
+				
+				Edge newOutgoing = new Edge(newEdge.to, new Node(newEdge.to.x + dxOutgoing, newEdge.to.y + dyOutgoing));
+				edges.add(newOutgoing);
+				
+				boolean match1 = false;
+				boolean match2 = false;
+				for (var cell : voronoiCells) {
+					for (Iterator<Edge> e = cell.edges.iterator(); e.hasNext();) {
+						var f = e.next();
+						if (f.equals(newEdge)) {
+							match1 = true;
+						}else if (f.equals(currentEdge)) {
+							match2 = true;
+						}
+					}
+					if (match1 ^ match2) {
+						cell.edges.add(newOutgoing);
+					}
+					match1 = false;
+					match2 = false;
+				}
+				edges.add(newOutgoing);
+				return;
+			}
+		}
+		edges.add(newEdge);
 	}
 
 	public ArrayList<Node> getVoronoiCentroids() {
