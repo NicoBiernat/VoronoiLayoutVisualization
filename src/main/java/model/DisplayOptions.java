@@ -1,6 +1,11 @@
 package model;
 
 public enum DisplayOptions {
+    ENABLE_SUBSTEPS {
+        public String toString() {
+            return "Enable substeps";
+        }
+    },
     GRAPH_NODES {
         public String toString() {
             return "Graph nodes";
@@ -41,9 +46,4 @@ public enum DisplayOptions {
             return "Show node displacement";
         }
     },
-    ENABLE_SUBSTEPS {
-        public String toString() {
-            return "Enable substeps";
-        }
-    }
 }

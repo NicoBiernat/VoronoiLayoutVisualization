@@ -84,15 +84,15 @@ public class Canvas extends JPanel {
     }
 
     if (lloydStep == null) {
-      drawNodes(g2d, inputGraph);
-      drawEdges(g2d, inputGraph);
+      if (displayOptions.getOrDefault(DisplayOptions.GRAPH_EDGES,false))
+        drawEdges(g2d, inputGraph);
+      if (displayOptions.getOrDefault(DisplayOptions.GRAPH_NODES,false))
+        drawNodes(g2d, inputGraph);
       return;
     }
 
-    if (displayOptions.getOrDefault(DisplayOptions.VORONOI_CENTROIDS, false))
-      drawVoronoiCentroids(g2d);
-    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_NODES,false))
-      drawNodes(g2d, lloydStep.inputGraph);
+    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_EDGES,false))
+      drawEdges(g2d, lloydStep.inputGraph);
     if (displayOptions.getOrDefault(DisplayOptions.DELAUNAY_CIRCLES, false))
       drawDelaunayCircles(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.DELAUNAY_EDGES,false))
@@ -101,11 +101,13 @@ public class Canvas extends JPanel {
       drawVoronoiEdges(g2d);
     if (displayOptions.getOrDefault(DisplayOptions.VORONOI_NODES,false))
       drawVoronoiNodes(g2d);
+//    g2d.setStroke(new BasicStroke(2));
+    if (displayOptions.getOrDefault(DisplayOptions.VORONOI_CENTROIDS, false))
+      drawVoronoiCentroids(g2d);
+    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_NODES,false))
+      drawNodes(g2d, lloydStep.inputGraph);
     if (displayOptions.getOrDefault(DisplayOptions.SHOW_NODE_DISPLACEMENT, false))
       drawNodeDisplacement(g2d);
-    g2d.setStroke(new BasicStroke(2));
-    if (displayOptions.getOrDefault(DisplayOptions.GRAPH_EDGES,false))
-      drawEdges(g2d, lloydStep.inputGraph);
   }
 
   private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {
@@ -113,6 +115,7 @@ public class Canvas extends JPanel {
       g2d.setColor(Color.RED);
       drawOval(Color.RED,node.x,node.y,14,g2d);
       g2d.setColor(Color.BLACK);
+      g2d.setFont(new Font("Arial", Font.PLAIN, 15));
       g2d.drawString(node.id, (int) (node.x * SCALING_CONST - 5+OFFSET_CONST), (int) (node.y * SCALING_CONST - 5+OFFSET_CONST));
 //      System.out.println("Drawing " + node.id + " at (" + ((int) node.x * SCALING_CONST - 5) + ", " + ((int) node.y * SCALING_CONST - 5) + ")");
     }
@@ -120,7 +123,7 @@ public class Canvas extends JPanel {
 
   private void drawEdges(Graphics2D g2d, LloydStep.Graph graph) {
     for (var edge : graph.edges) {
-      g2d.setColor(Color.BLACK);
+      g2d.setColor(Color.GRAY);
       g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
     }
   }

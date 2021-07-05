@@ -22,7 +22,7 @@ public class Header extends JPanel implements View {
     };
 
     public Header() {
-        headline = new JLabel("Voronoi Layout Visualization");
+        headline = new JLabel("");
         headline.setFont(new Font("Arial", Font.PLAIN, 30));
         add(headline);
     }
@@ -36,7 +36,7 @@ public class Header extends JPanel implements View {
                 headline.setText("Input graph (after force-directed layout)");
             }
         } else {
-            headline.setText("Voronoi Layout Visualization");
+            headline.setText("");
         }
     }
 }

@@ -19,25 +19,27 @@ public class MainView extends JFrame implements View {
     setResizable(true);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
-    // TODO: header or no header?
 
     header = new Header();
-    add(header, BorderLayout.NORTH);
 
+    JPanel canvasPanel = new JPanel();
+    canvasPanel.setLayout(new BorderLayout());
     canvas = new Canvas();
-    canvas.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-    add(canvas, BorderLayout.CENTER);
+//    canvas.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    canvasPanel.add(canvas, BorderLayout.CENTER);
+    canvasPanel.add(header, BorderLayout.SOUTH);
+    add(canvasPanel, BorderLayout.CENTER);
 
     JPanel right = new JPanel();
     right.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
 
     //Header
-    JPanel labelContainer = new JPanel(new FlowLayout());
-    JLabel navLabel = new JLabel("Algorithm control");
-    navLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-    labelContainer.add(navLabel);
-    right.add(labelContainer);
+//    JPanel labelContainer = new JPanel(new FlowLayout());
+//    JLabel navLabel = new JLabel("Algorithm control");
+//    navLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+//    labelContainer.add(navLabel);
+//    right.add(labelContainer);
 
     fileControl = new FileControl();
     right.add(fileControl);
