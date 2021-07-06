@@ -273,6 +273,7 @@ public class LloydStep {
 
 		delaunayTriangles = computeDelaunayTriangulation(inputGraph.nodes);
 
+		//List to keep track of outgoing edges
 		var outgoingEdges = new ArrayList<Edge>();
 		// compute voronoiCells
 		for (var delaunayEdge : getDelaunayEdges()) {
@@ -286,26 +287,30 @@ public class LloydStep {
 				var dx = delaunayEdge.from.x - delaunayEdge.to.x;
 				var dy = delaunayEdge.from.y - delaunayEdge.to.y;
 
+				//rotate by 90°
 				double h = dy;
-				
 				dy = dx;
 				dx = -h;
 
 				double x;
 				double y;
 
+				//calculate the factor needed to reach the boarder in the x direction
 				if (dx > 0) {
 					x = (WIDTH - circumCenter.x) / dx;
 				} else {
 					x = -(circumCenter.x / dx);
 				}
 				
+				//calculate the factor needed to reach the boarder in the y direction
 				if (dy > 0) {
 					y = (HEIGHT - circumCenter.y) / dy;
 				} else {
 					y = -(circumCenter.y / dy);
 				}
 
+				//the smaller factor is used to calculate the intersection with the boarder
+				//since it is the direction in which the edge crosses the boarder first
 				if (Math.abs(x) < Math.abs(y)) {
 					dx *= Math.abs(x);
 					dy *= Math.abs(x);
@@ -314,6 +319,7 @@ public class LloydStep {
 					dy *= Math.abs(y);
 				}
 
+				//create new Edge and check clipping with other outgoing edges
 				var frameCrossing = new Node("F" + circumCenter.toString(), circumCenter.x + dx, circumCenter.y + dy);
 				var voronoiEdge = new Edge(circumCenter, frameCrossing);
 				getVoronoiCellForNode(delaunayEdge.from).edges.add(voronoiEdge);
@@ -369,7 +375,9 @@ public class LloydStep {
 	public void checkClipping(ArrayList<Edge> edges, Edge newEdge) {
 		for (Iterator<Edge> i = edges.iterator(); i.hasNext();) {
 			Edge currentEdge = i.next();
+			//check if the current edge crosses the new edge
 			if (Line2D.linesIntersect(newEdge.from.x, newEdge.from.y, newEdge.to.x, newEdge.to.y, currentEdge.from.x, currentEdge.from.y, currentEdge.to.x, currentEdge.to.y)) {
+				//calculate the normed vectors of the current and new edge
 				var dxNew = newEdge.from.x - newEdge.to.x;
 				var dyNew = newEdge.from.y - newEdge.to.y;
 				var dxCurrent = currentEdge.from.x - currentEdge.to.x;
@@ -381,7 +389,7 @@ public class LloydStep {
 				dxCurrent /= lenCurrent;
 				dyCurrent /= lenCurrent;
 				
-				
+				//calculate the point at which the two edges cross
 				var x = ((currentEdge.from.x - newEdge.from.x) * dyCurrent - (currentEdge.from.y - newEdge.from.y) * dxCurrent) / (dxNew * dyCurrent - dyNew * dxCurrent);
 				var y = ((currentEdge.from.x - newEdge.from.x) * dyNew - (currentEdge.from.y - newEdge.from.y) * dxNew) / (dxNew * dyCurrent - dyNew * dxCurrent);
 				newEdge.to.x = newEdge.from.x + x * dxNew;
@@ -392,6 +400,7 @@ public class LloydStep {
 				edges.remove(currentEdge);
 				edges.remove(newEdge);
 				
+				//calculate the intersection of the new outgoing Edge with the boarder
 				var dxOutgoing = -dxNew - dxCurrent;
 				var dyOutgoing = -dyNew - dyCurrent;
 
@@ -415,9 +424,10 @@ public class LloydStep {
 					dyOutgoing *= Math.abs(y);
 				}
 				
+				//create the new outgoing Edge
 				Edge newOutgoing = new Edge(newEdge.to, new Node(newEdge.to.x + dxOutgoing, newEdge.to.y + dyOutgoing));
-				edges.add(newOutgoing);
 				
+				//search for the voronoi cells of the new outgoing Edge
 				boolean match1 = false;
 				boolean match2 = false;
 				for (var cell : voronoiCells) {
@@ -429,16 +439,19 @@ public class LloydStep {
 							match2 = true;
 						}
 					}
+					//if one of the new or current Edge is part of a cell the new outgoing Edge must also be part of that cell
 					if (match1 ^ match2) {
 						cell.edges.add(newOutgoing);
 					}
 					match1 = false;
 					match2 = false;
 				}
+				//add the new outgoing Edge to the outgoing edges
 				edges.add(newOutgoing);
 				return;
 			}
 		}
+		//if the Edge dosen't cross any other outgoing Edge it isn't changed and added to the outgoing Edges
 		edges.add(newEdge);
 	}
 
