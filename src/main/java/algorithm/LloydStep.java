@@ -184,7 +184,7 @@ public class LloydStep {
 
 	public static class Edge {
 		public Node from;
-		public final Node to;
+		public Node to;
 
 		public Edge(Node from, Node to) {
 			this.from = from;
@@ -376,7 +376,7 @@ public class LloydStep {
 		for (Iterator<Edge> i = edges.iterator(); i.hasNext();) {
 			Edge currentEdge = i.next();
 			//check if the current edge crosses the new edge
-			if (Line2D.linesIntersect(newEdge.from.x, newEdge.from.y, newEdge.to.x, newEdge.to.y, currentEdge.from.x, currentEdge.from.y, currentEdge.to.x, currentEdge.to.y)) {
+			if (Line2D.linesIntersect(newEdge.from.x, newEdge.from.y, newEdge.to.x, newEdge.to.y, currentEdge.from.x, currentEdge.from.y, currentEdge.to.x, currentEdge.to.y) && !currentEdge.equals(newEdge) && !newEdge.from.equals(currentEdge.from)) {
 				//calculate the normed vectors of the current and new edge
 				var dxNew = newEdge.from.x - newEdge.to.x;
 				var dyNew = newEdge.from.y - newEdge.to.y;
@@ -392,10 +392,9 @@ public class LloydStep {
 				//calculate the point at which the two edges cross
 				var x = ((currentEdge.from.x - newEdge.from.x) * dyCurrent - (currentEdge.from.y - newEdge.from.y) * dxCurrent) / (dxNew * dyCurrent - dyNew * dxCurrent);
 				var y = ((currentEdge.from.x - newEdge.from.x) * dyNew - (currentEdge.from.y - newEdge.from.y) * dxNew) / (dxNew * dyCurrent - dyNew * dxCurrent);
-				newEdge.to.x = newEdge.from.x + x * dxNew;
-				newEdge.to.y = newEdge.from.y + x * dyNew;
-				currentEdge.to.x = newEdge.to.x;
-				currentEdge.to.y = newEdge.to.y;
+				var intersec = new Node(newEdge.from.x + x * dxNew, newEdge.from.y + x * dyNew);
+				newEdge.to = intersec;
+				currentEdge.to = intersec;
 				
 				edges.remove(currentEdge);
 				edges.remove(newEdge);
@@ -425,7 +424,7 @@ public class LloydStep {
 				}
 				
 				//create the new outgoing Edge
-				Edge newOutgoing = new Edge(newEdge.to, new Node(newEdge.to.x + dxOutgoing, newEdge.to.y + dyOutgoing));
+				Edge newOutgoing = new Edge(intersec, new Node(newEdge.to.x + dxOutgoing, newEdge.to.y + dyOutgoing));
 				
 				//search for the voronoi cells of the new outgoing Edge
 				boolean match1 = false;
@@ -448,6 +447,7 @@ public class LloydStep {
 				}
 				//add the new outgoing Edge to the outgoing edges
 				edges.add(newOutgoing);
+				checkClipping(edges, newOutgoing);
 				return;
 			}
 		}
