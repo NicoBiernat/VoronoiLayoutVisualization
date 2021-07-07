@@ -13,10 +13,10 @@ public class Header extends JPanel implements View {
     public static final String[] explanations = {
             "Input graph of this step",
             "Input graph without edges",
-            "Delaunay triangulation circles",
-            "Determine Delaunay triangles using the circles",
-            "Calculate Voronoi cells from Delaunay triangles",
-            "Each node has its own Voronoi cell",
+            "Delaunay triangulation",
+            "Determine circumscribed circles",
+            "Centers of the circles are the Voronoi nodes",
+            "Connect the Voronoi nodes to get Voronoi cells",
             "Calculate the centroid for each Voronoi cell",
             "Move each node to the centroid of its Voronoi cell"
     };
