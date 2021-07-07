@@ -21,6 +21,7 @@ public class AnimationController {
     public static class StepSliderController implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent changeEvent) {
+            if (inputDisabled()) return;
             Model.INSTANCE.setStep(((JSlider) changeEvent.getSource()).getValue());
         }
     }
@@ -28,6 +29,7 @@ public class AnimationController {
     public static class StepForwardController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (inputDisabled()) return;
             pauseIfPlaying();
             Model.INSTANCE.nextStepOrSubstep();
         }
@@ -36,6 +38,7 @@ public class AnimationController {
     public static class StepBackwardController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (inputDisabled()) return;
             pauseIfPlaying();
             Model.INSTANCE.previousStepOrSubstep();
         }
@@ -44,6 +47,7 @@ public class AnimationController {
     public static class GotoStartController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (inputDisabled()) return;
             pauseIfPlaying();
             Model.INSTANCE.firstStep();
         }
@@ -52,6 +56,7 @@ public class AnimationController {
     public static class GotoEndController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (inputDisabled()) return;
             pauseIfPlaying();
             Model.INSTANCE.lastStep();
         }
@@ -60,6 +65,7 @@ public class AnimationController {
     public static class PlayPauseController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            if (inputDisabled()) return;
             switch (actionEvent.getActionCommand()) {
                 case "play":
                     Model.INSTANCE.playSteps();
@@ -77,4 +83,7 @@ public class AnimationController {
         }
     }
 
+    private static boolean inputDisabled() {
+        return Model.INSTANCE.getLloydSteps() == null;
+    }
 }
