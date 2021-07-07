@@ -14,7 +14,7 @@ public class AnimationController {
         @Override
         public void stateChanged(ChangeEvent changeEvent) {
             int newValue = ((JSlider) changeEvent.getSource()).getValue();
-            Model.INSTANCE.setPlaybackSpeed(1000 / ( newValue + 1));
+            Model.INSTANCE.setPlaybackSpeed(1000 / (newValue + 1));
         }
     }
 

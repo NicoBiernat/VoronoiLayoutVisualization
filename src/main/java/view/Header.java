@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Header extends JPanel implements View {
 
-    private JLabel headline = new JLabel();
+    private final JLabel headline;
 
     public static final String[] explanations = {
             "Input graph of this step",

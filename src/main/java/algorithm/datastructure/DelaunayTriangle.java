@@ -1,11 +1,6 @@
-package algorithm;
+package algorithm.datastructure;
 
 public class DelaunayTriangle extends EdgeArc {
-    public DelaunayTriangle(Edge e1, Edge e2, Edge e3) {
-        edges.add(e1);
-        edges.add(e2);
-        edges.add(e3);
-    }
 
     public DelaunayTriangle(Node n1, Node n2, Node n3) {
         edges.add(new Edge(n1, n2));

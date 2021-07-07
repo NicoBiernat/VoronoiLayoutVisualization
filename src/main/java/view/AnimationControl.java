@@ -82,7 +82,7 @@ public class AnimationControl extends JPanel implements View {
     @Override
     public void update() {
         Model model = Model.INSTANCE;
-        if (model.isPlayingSteps()){
+        if (model.isPlayingSteps()) {
             playPauseButton.setActionCommand("pause");
             playPauseButton.setText("\u23F8");
         } else {
@@ -96,14 +96,14 @@ public class AnimationControl extends JPanel implements View {
         }
         stepSlider.setValue(model.getIndex());
 
-        if (model.getLloydSteps()!=null && model.getInputGraph()!=null) {
-            if (model.getLloydSteps().size() == 0 || model.getIndex() < 0){
+        if (model.getLloydSteps() != null && model.getInputGraph() != null) {
+            if (model.getLloydSteps().size() == 0 || model.getIndex() < 0) {
                 step.setText("<html>Input Graph<br>(after force-directed layout)</html>");
                 substep.setText("");
             } else {
                 step.setText("Step " + model.getIndex() + "/" + (model.getLloydSteps().size() - 1));
                 if (model.getDisplayOptions().getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false)) { // substeps enabled
-                    substep.setText("Substep " + model.getSubstepIndex() + "/" + (model.getNumSubsteps()-1));
+                    substep.setText("Substep " + model.getSubstepIndex() + "/" + (model.getNumSubsteps() - 1));
                 } else {
                     substep.setText("");
                 }

@@ -1,5 +1,9 @@
 package algorithm;
 
+import algorithm.datastructure.Edge;
+import algorithm.datastructure.EdgeArc;
+import algorithm.datastructure.Node;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,7 +44,7 @@ public class SutherlandHodgmanClipping {
 
         List<Edge> newEdges = new ArrayList<>();
         for (int i = 0; i < resultList.size(); i++) {
-            newEdges.add(new Edge(resultList.get(i), resultList.get((i+1) % resultList.size())));
+            newEdges.add(new Edge(resultList.get(i), resultList.get((i + 1) % resultList.size())));
         }
         polygon.edges = newEdges;
     }
@@ -55,7 +59,7 @@ public class SutherlandHodgmanClipping {
                                  ClippingDirection clippingDirection, double clippingEdgePos) {
         for (int i = 0; i < nodes.size(); i++) {
             var from = nodes.get(i);
-            var to = nodes.get((i+1) % nodes.size());
+            var to = nodes.get((i + 1) % nodes.size());
 
             if (inside.test(from) && inside.test(to)) { // both inside
                 resultList.add(to);
@@ -152,7 +156,7 @@ public class SutherlandHodgmanClipping {
         public TestCanvas() {
             List<Edge> edges = new ArrayList<>();
             for (int i = 0; i < nodes.length; i++) {
-                edges.add(new Edge(nodes[i], nodes[(i+1) % nodes.length]));
+                edges.add(new Edge(nodes[i], nodes[(i + 1) % nodes.length]));
             }
             List<Edge> edgesCopy = new ArrayList<>(edges);
 
@@ -204,9 +208,9 @@ public class SutherlandHodgmanClipping {
             }
         }
 
-        private void drawOval(java.awt.Color c, double x, double y, double size, Graphics2D g2d){
+        private void drawOval(java.awt.Color c, double x, double y, double size, Graphics2D g2d) {
             g2d.setColor(c);
-            g2d.fillOval((int) (x - size/2), (int) (y - size/2), (int) size, (int) size);
+            g2d.fillOval((int) (x - size / 2), (int) (y - size / 2), (int) size, (int) size);
         }
     }
 

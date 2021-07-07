@@ -18,6 +18,6 @@ public class DisplayOptionsController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         Model model = Model.INSTANCE;
-        model.setDisplayOption(option,((JCheckBox) actionEvent.getSource()).isSelected());
+        model.setDisplayOption(option, ((JCheckBox) actionEvent.getSource()).isSelected());
     }
 }

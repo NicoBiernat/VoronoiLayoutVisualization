@@ -1,4 +1,4 @@
-package algorithm;
+package algorithm.datastructure;
 
 public class Node {
     public double x = 0;
