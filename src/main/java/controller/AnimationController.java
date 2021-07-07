@@ -28,6 +28,7 @@ public class AnimationController {
     public static class StepForwardController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            pauseIfPlaying();
             Model.INSTANCE.nextStepOrSubstep();
         }
     }
@@ -35,6 +36,7 @@ public class AnimationController {
     public static class StepBackwardController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            pauseIfPlaying();
             Model.INSTANCE.previousStepOrSubstep();
         }
     }
@@ -42,6 +44,7 @@ public class AnimationController {
     public static class GotoStartController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            pauseIfPlaying();
             Model.INSTANCE.firstStep();
         }
     }
@@ -49,6 +52,7 @@ public class AnimationController {
     public static class GotoEndController implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            pauseIfPlaying();
             Model.INSTANCE.lastStep();
         }
     }
@@ -64,6 +68,12 @@ public class AnimationController {
                     Model.INSTANCE.pauseSteps();
                     break;
             }
+        }
+    }
+
+    private static void pauseIfPlaying() {
+        if (Model.INSTANCE.playingThread != null) {
+            Model.INSTANCE.pauseSteps();
         }
     }
 
