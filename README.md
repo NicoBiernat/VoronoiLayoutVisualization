@@ -57,7 +57,6 @@ We implemented a parser for our graph input format, Lloyd's algorithm for Vorono
 ## User Guide <a id="userguide"></a>
 ![image](https://user-images.githubusercontent.com/79837801/124779170-d7b89a80-df41-11eb-844e-02b893c9e61f.png)
 
-### Writing a graph file <a id="writegraph"></a>
 ### Opening the graph file <a id="opengraph"></a>
 ![image](https://user-images.githubusercontent.com/79837801/124780326-cb810d00-df42-11eb-8d5e-9a9f337cedd9.png)
 
