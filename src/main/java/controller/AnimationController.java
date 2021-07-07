@@ -78,7 +78,7 @@ public class AnimationController {
     }
 
     private static void pauseIfPlaying() {
-        if (Model.INSTANCE.playingThread != null) {
+        if (Model.INSTANCE.isPlayingSteps()) {
             Model.INSTANCE.pauseSteps();
         }
     }
