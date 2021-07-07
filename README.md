@@ -68,8 +68,8 @@ the graph will be displayed on the canvas and the file name next to the "Open fi
 ### Display options <a id="displayoptions"></a>
 
 When clicking on the first element in the "Display Options" section labeled "UI Design" a drop-down menu opens with options for the style of the UI.
-There are five different option namely "Metal", "Nimbus", "CDE/Motif", "Windows" and "Windows Classic" with "Metal" being the default.
-Under that there are nine checkboxes. The first one of which is used to enable or disable the substeps of the algorithm.
+There are five different options namely "Metal", "Nimbus", "CDE/Motif", "Windows" and "Windows Classic" with "Metal" being the default.
+Under that, there are nine checkboxes. The first one of which is used to enable or disable the substeps of the algorithm.
 The other ones are used to enable or disable different elements of the visualization.
 By default, the substeps are enabled. While this is the case, the program will automatically enable and disable the relevant elements for the current substep.
 In this mode, the checkboxes for the different elements can not be manually set. To do that, the substeps must be disabled.
@@ -79,12 +79,12 @@ The combination of these two options can be used to see how the nodes of the gra
 
 ![image](https://user-images.githubusercontent.com/79837801/124802333-24a76b80-df58-11eb-8f7c-b921016ce75f.png)
 
-The "Delaunay circles" and "Delaunay edges" show the triangulation of the nodes in yellow and the circumscribed circles light rgeen around those triangles.
+The "Delaunay circles" and "Delaunay edges" show the triangulation of the nodes in yellow and the circumscribed circles light green around those triangles.
 
 ![image](https://user-images.githubusercontent.com/79837801/124804554-b617dd00-df5a-11eb-8f47-f2600624f30d.png)
 
-The Delaunay edges can be used as a alternative to the graph edges for connectiong the graph nodes.
-This works espeasily good in combination with "Voronoi Edges" and "Voronoi nodes" enabeled. Both the nodes and edges are blue.
+The Delaunay edges can be used as an alternative to the graph edges for connecting the graph nodes.
+This works especially well in combination with "Voronoi Edges" and "Voronoi nodes" enabled. Both the nodes and edges are blue.
 The Voronoi nodes and edges form cells around the graph nodes. These are the Voronoi cells.
 
 ![image](https://user-images.githubusercontent.com/79837801/124805813-47d41a00-df5c-11eb-895b-908dfc836fba.png)
@@ -99,7 +99,7 @@ They represent the movement of the nodes in each step.
 
 Under The section "Animation Control" two sliders as well as five buttons can be found.
 The first slider labeled "Speed" is used to set the time interval between steps while the animation is running.
-To start the animation, the button in the middle is uses. If pressed, the program will automatically advance through the different substeps of the algorithm until paused by pressing the button again or the algorithm is finished.
+To start the animation, the button in the middle is used. If pressed, the program will automatically advance through the different substeps of the algorithm until paused by pressing the button again or the algorithm is finished.
 The two buttons to the left and right of the play button can be used to manually advance through the algorithm.
 If substeps are enabled, they will move one substep at a time. Otherwise, they will just go through the steps of the algorithm.
 To get to the first or last step of the algorithm quickly, the last two buttons can be used.
@@ -139,7 +139,7 @@ Step four removes the Delaunay edges and replaces them with the centers of the D
 #### Step 5
 ![image](https://user-images.githubusercontent.com/79837801/124798914-39820000-df54-11eb-9aa6-273d607fe94d.png)
 
-Starting from the Voronoi nodes added in step four, the Voronoi edges move orthogonal through the Delaunay edges and get clipped at the boarder of the canvas
+Starting from the Voronoi nodes added in step four, the Voronoi edges move orthogonally through the Delaunay edges and get clipped at the border of the canvas
 or if they intersect one another.
 To make this better visible, the Delauney edges get displayed again and the Delaunay circles are removed.
 
@@ -189,31 +189,35 @@ edge n2 -> n3
 ### Lloyd Implementation and Internal Graph Format<a id="internalformat"></a>
  
 We decided to use our own graph format. We thought that this might be easier and quicker to use than ELK-Graphs, leaving out some properties of an ELK-Graph like ports and hyperedges, and adding others like `DelaunayTriangle`s and `VoronoiCell`s.  
-During the algorithms run, a list of `LloydStep`s is collected. Each `LloydStep` contains the graph before executing the step, and calculates a list of `DelaunayTriangle` which forms a [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) of the input graph and using the triangulation a list of `VoronoiCell`, which each holds an association to the input `Node` they correspond to. 
+During the algorithms run, a list of `LloydStep`s is collected. Each `LloydStep` contains the graph before executing the step and calculates a list of `DelaunayTriangle` which forms a [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) of the input graph and using the triangulation a list of `VoronoiCell`, which each holds an association to the input `Node` they correspond to. 
 
 The following picture illustrates the steps in the final version of our algorithm:
 
 ![image](https://user-images.githubusercontent.com/25539263/124821595-347e7a00-df6f-11eb-8569-0e6cc213746a.png)
 
-We precompute all lloyds relaxation steps after a file is loaded, so that its easier to play it back smoothly afterwards and in order to properly seperate the calculation from the display. The `LloydRelaxation` class is the main class of the algorithm which is instantiated with an `ElkNode` which has to be layouted in some way before. This `inputGraph` is then converted into the internal `Graph` format. The transformed Graph is then rescaled to ensure that it fits within the specified bounds before applying the relaxation. The `LloydStep` calculates the Voronoi cells associated with the given graph to enable the `LloydRelaxation` to perform one iteration of Lloyd's algorithm: The graph is cloned and the coordinates of the nodes are set to the coordiantes of the centroids of the corresponding Voronoi cells. This moving of the Graphs nodes is repeated until every node moved less than a specified distance in one iteration.
+We precompute all Lloyd relaxation steps after a file is loaded so that it is easier to play it back smoothly afterward and to properly separate the calculation from the display. The `LloydRelaxation` class is the main class of the algorithm which is instantiated with an `ElkNode` which has to be layouted in some way before. This `inputGraph` is then converted into the internal `Graph` format. The transformed Graph is then rescaled to ensure that it fits within the specified bounds before applying the relaxation. The `LloydStep` calculates the Voronoi cells associated with the given graph to enable the `LloydRelaxation` to perform one iteration of Lloyd's algorithm: The graph is cloned and the coordinates of the nodes are set to the coordinates of the centroids of the corresponding Voronoi cells. This moving of the Graphs nodes is repeated until every node moved less than a specified distance in one iteration.
 
-In the LloydStep itself at first a Delauney triangulation of the input nodes is calculated. This is done incrementally, based on http://paulbourke.net/papers/triangulate/: First a large super triangle is created which encloses all nodes of the graph, then each node is added one by one to the previous triangles, now every triangle is removed for which the circumcircle includes the new node, violating the delaunay property. Then new triangles are created to fill the hole. After all nodes are added, the super triangle is removed, and a delauney triangulation is obtained. The resulting datastructure `DelaunayTriangle` is a list of 3 `Edge`s respectively and is a superclass of `EdgeArc`: A list of `Edge`s enhanced by methods for computing circumcircles and centroids, etc. The formulas for those are based on https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/ and https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+In the LloydStep itself at first, a Delauney triangulation of the input nodes is calculated. This is done incrementally, based on http://paulbourke.net/papers/triangulate/: First, a large super triangle is created which encloses all nodes of the graph, then each node is added one by one to the previous triangles, now every triangle is removed for which the circumcircle includes the new node, violating the Delaunay property. Then new triangles are created to fill the hole. After all nodes are added, the super triangle is removed, and a Delauney triangulation is obtained. The resulting data structure `DelaunayTriangle` is a list of 3 `Edge`s respectively and is a superclass of `EdgeArc`: A list of `Edge`s enhanced by methods for computing circumcircles and centroids, etc. The formulas for those are based on https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/ and https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
 
-Fromt he DelauneyTriangulation the Voronoi cells are calculated, for each edge in the triangulation there is a dual Voronoi edge, if an Edge belongs to two triangles it is internal and the coresponding Voronoi edge lays between th two centroids. If the Delauney edge only belongs to one triangle, the Voronoi edge must be extended from the centroid orthogonally thru the delauney edge until it crosses with the bounding box. The obtained Voronoi Edge is stored in the `VoronoiCell`s associated with the graph node the cells belong to. `VoronoiCell` is also a superclass of `EdgeArc` to be able to compute centroids easily.
+From the Delauney triangulation, the Voronoi cells are calculated, for each edge in the triangulation there is a dual Voronoi edge, if an Edge belongs to two triangles it is internal and the corresponding Voronoi edge lays between the two centroids. If the Delauney edge only belongs to one triangle, the Voronoi edge must be extended from the centroid orthogonally thru the Delauney edge until it crosses with the bounding box. The obtained Voronoi Edge is stored in the `VoronoiCell`s associated with the graph node the cells belong to. `VoronoiCell` is also a superclass of `EdgeArc` to be able to compute centroids easily.
 
 Then all open `VoronoiCell`s at the outer edge are closed using line segments connecting to the edges of the bounding box.
 
-In the Last step the `VoronoiCell`s are clipped to the bounding box using the Sutherland Hodgman algorithm.
+In the last step, the `VoronoiCell`s are clipped to the bounding box using the Sutherland Hodgman algorithm.
 
 
 --- 
 
 ## Visualization <a id="visualization"></a>
 
+Below the Visualization that we mocked in the beginning can be seen: 
 ![image](https://user-images.githubusercontent.com/25539263/122387462-2c827a00-cf6f-11eb-9953-42bdaabd4f55.png)
 
-We want to let the user choose to either automatically step through the algorithm at a certain speed or manually step through it.  
-Furthermore we might change the visualization a bit, but only smaller things like labels, colors, sizes, scaling and clipping. We want to have different levels of detail by either implementing sub-steps:  
-(Delaunay triangles -> Delaunay centroid -> Voronoi cells ->  Voronoi centroid -> move nodes)  
-or have checkboxes to enable the visualization of the different parts.  
-As a bonus (if there is enough time and motivation at the end), we might implement a smooth interpolation between the steps.
+We implemented the visuals close to the designed visualization:
+![image](https://user-images.githubusercontent.com/25539263/124823073-0ef27000-df71-11eb-8fc8-37b264631c99.png)
+
+Only Some additions were made: The Delauney circles are also displayed as well as the ability to display substeps was added.
+
+We wanted to let the user choose to either automatically step through the algorithm at a certain speed or manually step through it. We also implemented different levels of detail by letting the user enable sub-steps:  
+(Input Graph -> Delaunay triangles -> Delaunay circumcircles -> Voronoi Edges -> Voronoi cells ->  Voronoi centroids -> displacment arrows)  
+We also wanted to use to be able to select the Parts of the algorithm  to be displayed manually, which is realized by checkboxes enabling certain parts of the rendering 
