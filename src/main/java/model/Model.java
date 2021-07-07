@@ -5,6 +5,7 @@ import algorithm.LloydRelaxation;
 import algorithm.LloydStep;
 import org.eclipse.elk.alg.force.options.ForceMetaDataProvider;
 import org.eclipse.elk.alg.force.options.ForceOptions;
+import org.eclipse.elk.alg.force.options.StressOptions;
 import org.eclipse.elk.core.RecursiveGraphLayoutEngine;
 import org.eclipse.elk.core.options.CoreOptions;
 import org.eclipse.elk.core.util.BasicProgressMonitor;
@@ -15,6 +16,9 @@ import view.View;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Model {
 
@@ -61,6 +65,7 @@ public class Model {
       System.out.println(e.getSources().get(0).getIdentifier() + " -> " + e.getTargets().get(0).getIdentifier());
     }*/
 
+//    testGraph.setProperty(CoreOptions.ALGORITHM, StressOptions.ALGORITHM_ID);
     testGraph.setProperty(CoreOptions.ALGORITHM, ForceOptions.ALGORITHM_ID);
     testGraph.setProperty(CoreOptions.SPACING_NODE_NODE, 10000.0);
     testGraph.setProperty(ForceMetaDataProvider.ITERATIONS, 10000);
@@ -158,7 +163,7 @@ public class Model {
     updateViews();
   }
 
-  private Thread playingThread;
+  public Thread playingThread;
 
   //TODO this is not pretty but it works, maybe reuse threads, and make everything more thread safe i guess
   public void playSteps() {
@@ -167,9 +172,8 @@ public class Model {
         while (playingThread!=null && (index < lloydSteps.size()-1 || substepIndex < substepOptions.size()-1)){
           nextStepOrSubstep();
           try {
-            //TODO implement interpolation
-            //TODO implement substeps
-            Thread.sleep(playBackSpeed);
+            boolean substepsEnabled = displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false);
+            Thread.sleep(substepsEnabled ? (long) (playBackSpeed * 5.0) : playBackSpeed);
           } catch (InterruptedException e) {
             //swallow
           }
@@ -280,13 +284,13 @@ public class Model {
                   DisplayOptions.ENABLE_SUBSTEPS, true), // nodes
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
-                  DisplayOptions.DELAUNAY_CIRCLES, true,
-                  DisplayOptions.DELAUNAY_EDGES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, false,
+                  DisplayOptions.DELAUNAY_EDGES, true,
                   DisplayOptions.VORONOI_EDGES, false,
                   DisplayOptions.VORONOI_NODES, false,
                   DisplayOptions.VORONOI_CENTROIDS, false,
                   DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
-                  DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes and delaunay circles
+                  DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes and delaunay edges
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
                   DisplayOptions.DELAUNAY_CIRCLES, true,
@@ -298,22 +302,22 @@ public class Model {
                   DisplayOptions.ENABLE_SUBSTEPS, true),  // nodes, delaunay circles and delaunay edges
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
-                  DisplayOptions.DELAUNAY_CIRCLES, false,
-                  DisplayOptions.DELAUNAY_EDGES, true,
-                  DisplayOptions.VORONOI_EDGES, true,
-                  DisplayOptions.VORONOI_NODES, false,
+                  DisplayOptions.DELAUNAY_CIRCLES, true,
+                  DisplayOptions.DELAUNAY_EDGES, false,
+                  DisplayOptions.VORONOI_EDGES, false,
+                  DisplayOptions.VORONOI_NODES, true,
                   DisplayOptions.VORONOI_CENTROIDS, false,
                   DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
-                  DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, delaunay edges and voronoi edges
+                  DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, delaunay circles and voronoi nodes
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
                   DisplayOptions.DELAUNAY_CIRCLES, false,
-                  DisplayOptions.DELAUNAY_EDGES, false,
+                  DisplayOptions.DELAUNAY_EDGES, true,
                   DisplayOptions.VORONOI_EDGES, true,
                   DisplayOptions.VORONOI_NODES, true,
                   DisplayOptions.VORONOI_CENTROIDS, false,
                   DisplayOptions.SHOW_NODE_DISPLACEMENT, false,
-                  DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, voronoi edges and voronoi nodes
+                  DisplayOptions.ENABLE_SUBSTEPS, true), // nodes, delaunay edges, voronoi edges and voronoi nodes
           Map.of(DisplayOptions.GRAPH_NODES, true,
                   DisplayOptions.GRAPH_EDGES, false,
                   DisplayOptions.DELAUNAY_CIRCLES, false,
