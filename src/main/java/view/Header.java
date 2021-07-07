@@ -36,7 +36,11 @@ public class Header extends JPanel implements View {
             headline.setText("");
         }
         if (model.getIndex() == -1) {
-            headline.setText("Input graph (after force-directed layout)");
+            if (model.getLloydSteps() == null) {
+                headline.setText("");
+            } else {
+                headline.setText("Input graph (after force-directed layout)");
+            }
         }
     }
 }
