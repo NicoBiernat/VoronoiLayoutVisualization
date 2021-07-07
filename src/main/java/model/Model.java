@@ -15,6 +15,10 @@ import view.View;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Model {
 
@@ -147,35 +151,27 @@ public class Model {
         updateViews();
     }
 
-    public Thread playingThread;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> scheduledFuture;
 
     public void playSteps() {
-        if (playingThread == null) {
-            playingThread = new Thread(() -> {
-                while (playingThread != null && (index < lloydSteps.size() - 1 || substepIndex < substepOptions.size() - 1)) {
-                    nextStepOrSubstep();
-                    try {
-                        boolean substepsEnabled = displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false);
-                        Thread.sleep(substepsEnabled ? (long) (playBackSpeed * 5.0) : playBackSpeed);
-                    } catch (InterruptedException e) {
-                        //swallow
-                    }
-                    updateViews();
-                }
-                playingThread = null;
-                updateViews();
-            });
-            playingThread.start();
-        }
+        boolean substepsEnabled = displayOptions.getOrDefault(DisplayOptions.ENABLE_SUBSTEPS, false);
+        long speed = substepsEnabled ? (long) (playBackSpeed * 5.0) : playBackSpeed;
+        scheduledFuture = scheduler.scheduleAtFixedRate(() -> {
+            if (index < lloydSteps.size() - 1 || substepIndex < substepOptions.size() - 1) {
+                nextStepOrSubstep();
+            }
+        }, speed, speed, TimeUnit.MILLISECONDS);
+        updateViews();
     }
 
     public boolean isPlayingSteps() {
-        return playingThread != null;
+        return scheduledFuture != null && !scheduledFuture.isCancelled();
     }
 
     public void pauseSteps() {
-        if (playingThread != null) {
-            playingThread = null;
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(true);
             updateViews();
         }
     }
@@ -201,10 +197,13 @@ public class Model {
         return substepOptions.size();
     }
 
-    int playBackSpeed = (1000 / (50 + 1));
+    private int playBackSpeed = (1000 / (50 + 1));
 
     public void setPlaybackSpeed(int newSpeed) {
+        boolean isPlaying = isPlayingSteps();
+        pauseSteps();
         playBackSpeed = newSpeed;
+        if (isPlaying) playSteps();
     }
 
     public void setStep(int step) {

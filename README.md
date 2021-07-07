@@ -186,12 +186,25 @@ edge n1 -> n2
 edge n2 -> n3
 ```
 
-### Internal Graph Format <a id="internalformat"></a>
-
-![image](https://user-images.githubusercontent.com/25539263/122387810-8a16c680-cf6f-11eb-8dd7-cb5b5434af54.png)
-
+### Lloyd Implementation and Internal Graph Format<a id="internalformat"></a>
+ 
 We decided to use our own graph format. We thought that this might be easier and quicker to use than ELK-Graphs, leaving out some properties of an ELK-Graph like ports and hyperedges, and adding others like `DelaunayTriangle`s and `VoronoiCell`s.  
 During the algorithms run, a list of `LloydStep`s is collected. Each `LloydStep` contains the graph before executing the step, and calculates a list of `DelaunayTriangle` which forms a [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) of the input graph and using the triangulation a list of `VoronoiCell`, which each holds an association to the input `Node` they correspond to. 
+
+The following picture illustrates the steps in the final version of our algorithm:
+
+![image](https://user-images.githubusercontent.com/25539263/124821595-347e7a00-df6f-11eb-8569-0e6cc213746a.png)
+
+We precompute all lloyds relaxation steps after a file is loaded, so that its easier to play it back smoothly afterwards and in order to properly seperate the calculation from the display. The `LloydRelaxation` class is the main class of the algorithm which is instantiated with an `ElkNode` which has to be layouted in some way before. This `inputGraph` is then converted into the internal `Graph` format. The transformed Graph is then rescaled to ensure that it fits within the specified bounds before applying the relaxation. The `LloydStep` calculates the Voronoi cells associated with the given graph to enable the `LloydRelaxation` to perform one iteration of Lloyd's algorithm: The graph is cloned and the coordinates of the nodes are set to the coordiantes of the centroids of the corresponding Voronoi cells. This moving of the Graphs nodes is repeated until every node moved less than a specified distance in one iteration.
+
+In the LloydStep itself at first a Delauney triangulation of the input nodes is calculated. This is done incrementally, based on http://paulbourke.net/papers/triangulate/: First a large super triangle is created which encloses all nodes of the graph, then each node is added one by one to the previous triangles, now every triangle is removed for which the circumcircle includes the new node, violating the delaunay property. Then new triangles are created to fill the hole. After all nodes are added, the super triangle is removed, and a delauney triangulation is obtained. The resulting datastructure `DelaunayTriangle` is a list of 3 `Edge`s respectively and is a superclass of `EdgeArc`: A list of `Edge`s enhanced by methods for computing circumcircles and centroids, etc. The formulas for those are based on https://www.geeksforgeeks.org/find-the-centroid-of-a-non-self-intersecting-closed-polygon/ and https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
+
+Fromt he DelauneyTriangulation the Voronoi cells are calculated, for each edge in the triangulation there is a dual Voronoi edge, if an Edge belongs to two triangles it is internal and the coresponding Voronoi edge lays between th two centroids. If the Delauney edge only belongs to one triangle, the Voronoi edge must be extended from the centroid orthogonally thru the delauney edge until it crosses with the bounding box. The obtained Voronoi Edge is stored in the `VoronoiCell`s associated with the graph node the cells belong to. `VoronoiCell` is also a superclass of `EdgeArc` to be able to compute centroids easily.
+
+Then all open `VoronoiCell`s at the outer edge are closed using line segments connecting to the edges of the bounding box.
+
+In the Last step the `VoronoiCell`s are clipped to the bounding box using the Sutherland Hodgman algorithm.
+
 
 --- 
 
