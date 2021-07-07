@@ -1,5 +1,7 @@
 # Voronoi Layout Algorithm Visualization
 
+### by Nico Biernat, Corvin Fischer Rivera and Alexander Seidler (Group B)
+
 ## Table of contents
 1. [How to start](#how-to-start)
 2. [User guide](#userguide)
