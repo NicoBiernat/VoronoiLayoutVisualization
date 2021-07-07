@@ -7,31 +7,27 @@ import java.util.Map;
 
 import org.eclipse.elk.graph.ElkNode;
 
-import algorithm.LloydStep.Edge;
-import algorithm.LloydStep.Graph;
-import algorithm.LloydStep.Node;
-
 public class LloydRelaxation {
 	private static final double MAX_DISTANCE = 0.01;
 	public final ElkNode inputGraph;
-	public final LloydStep.Graph transformedGraph;
-	public final Map<ElkNode, LloydStep.Node> transformationMap;
+	public final Graph transformedGraph;
+	public final Map<ElkNode, Node> transformationMap;
 	public final List<LloydStep> lloydSteps = new ArrayList<>();
 
 	public LloydRelaxation(ElkNode inputGraph) {
 		this.inputGraph = inputGraph;
-		List<LloydStep.Edge> edges = new ArrayList<>();
-		List<LloydStep.Node> nodes = new ArrayList<>();
+		List<Edge> edges = new ArrayList<>();
+		List<Node> nodes = new ArrayList<>();
 		transformationMap = new HashMap<>();
 		for (var elkNode : inputGraph.getChildren()) {
-			var node = new LloydStep.Node(elkNode.getIdentifier(), elkNode.getX(), elkNode.getY());
+			var node = new Node(elkNode.getIdentifier(), elkNode.getX(), elkNode.getY());
 			transformationMap.put(elkNode, node);
 			nodes.add(node);
 		}
 		for (var edge : inputGraph.getContainedEdges())
-			edges.add(new LloydStep.Edge(transformationMap.get((ElkNode) edge.getSources().get(0)),
+			edges.add(new Edge(transformationMap.get((ElkNode) edge.getSources().get(0)),
 					transformationMap.get((ElkNode) edge.getTargets().get(0))));
-		this.transformedGraph = new LloydStep.Graph(nodes, edges);
+		this.transformedGraph = new Graph(nodes, edges);
 	}
 
 	private boolean distance(Node a, Node b) {

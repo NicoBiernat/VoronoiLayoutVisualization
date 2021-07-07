@@ -15,8 +15,6 @@ public class Main {
     Model model = Model.INSTANCE;
     MainView view = new MainView();
     model.registerView(view);
-    //FIXME: dev override
-    model.loadGraph(generateRandomGraph(17,100,new Random(8)));
   }
 
   public static ElkNode generateRandomGraph(int numNodes, int numEdges, Random rnd) {

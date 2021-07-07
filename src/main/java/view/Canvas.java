@@ -1,5 +1,7 @@
 package view;
 
+import algorithm.DelaunayTriangle;
+import algorithm.Graph;
 import algorithm.LloydStep;
 import model.DisplayOptions;
 
@@ -8,16 +10,14 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.util.Map;
-import java.util.Random;
 
 public class Canvas extends JPanel {
   double SCALING_CONST = 1;
   double OFFSET_CONST = 100;
 
   private LloydStep lloydStep;
-  private LloydStep.Graph inputGraph;
+  private Graph inputGraph;
   private Map<DisplayOptions, Boolean> displayOptions;
 
   public Canvas() {
@@ -39,7 +39,7 @@ public class Canvas extends JPanel {
     repaint();
   }
 
-  public void update(LloydStep.Graph graph, Map<DisplayOptions,Boolean> displayOptions) {
+  public void update(Graph graph, Map<DisplayOptions,Boolean> displayOptions) {
     this.inputGraph = graph;
     this.lloydStep = null;
     this.displayOptions=displayOptions;
@@ -111,7 +111,7 @@ public class Canvas extends JPanel {
       drawNodeDisplacement(g2d);
   }
 
-  private void drawNodes(Graphics2D g2d, LloydStep.Graph graph) {
+  private void drawNodes(Graphics2D g2d, Graph graph) {
     for (var node : graph.nodes) {
       g2d.setColor(Color.RED);
       drawOval(Color.RED,node.x,node.y,14,g2d);
@@ -122,7 +122,7 @@ public class Canvas extends JPanel {
     }
   }
 
-  private void drawEdges(Graphics2D g2d, LloydStep.Graph graph) {
+  private void drawEdges(Graphics2D g2d, Graph graph) {
     for (var edge : graph.edges) {
       g2d.setColor(Color.LIGHT_GRAY);
       g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
@@ -131,7 +131,7 @@ public class Canvas extends JPanel {
 
   private void drawDelaunayCircles(Graphics2D g2d) {
     for (var triangle : lloydStep.delaunayTriangles) {
-      LloydStep.DelaunayTriangle.Circle circle = triangle.getCircumCircle();
+      DelaunayTriangle.Circle circle = triangle.getCircumCircle();
       g2d.setColor(Color.GREEN);
       g2d.drawOval((int) ((circle.center.x - circle.radius) * SCALING_CONST + OFFSET_CONST), (int) ((circle.center.y - circle.radius) * SCALING_CONST + OFFSET_CONST), (int) (2*circle.radius*SCALING_CONST), (int) (2*circle.radius*SCALING_CONST));
     }
@@ -158,23 +158,19 @@ public class Canvas extends JPanel {
       g2d.setColor(Color.BLUE);
       drawOval(Color.BLUE,centroid.x,centroid.y,14,g2d);
       g2d.setColor(Color.BLACK);
-      g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) (centroid.x * SCALING_CONST - 5+OFFSET_CONST), (int) (centroid.y * SCALING_CONST - 5+OFFSET_CONST));
+      //g2d.drawString("" + triangle.edges.get(0).from + triangle.edges.get(1).from + triangle.edges.get(2).from, (int) (centroid.x * SCALING_CONST - 5+OFFSET_CONST), (int) (centroid.y * SCALING_CONST - 5+OFFSET_CONST));
     }
   }
 
   private void drawVoronoiEdges(Graphics2D g2d) {
-	    var width = lloydStep.voronoiCells.size()*2+1;
-	    for (var cell : lloydStep.voronoiCells) {
-	    	Color clr = Color.getHSBColor(width*0.28f % 1,1,0.75f);
-	      g2d.setStroke(new BasicStroke(width--));
-	      width--;
-	      for (var edge : cell.edges) {
-	        g2d.setColor(clr);
-	        g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
-	      }
-	    }
-	    g2d.setStroke(new BasicStroke(2));
-	  }
+    for (var cell : lloydStep.voronoiCells) {
+      for (var edge : cell.edges) {
+        g2d.setColor(Color.BLUE);
+        g2d.drawLine((int) (edge.from.x * SCALING_CONST+OFFSET_CONST), (int) (edge.from.y * SCALING_CONST+OFFSET_CONST), (int) (edge.to.x * SCALING_CONST+OFFSET_CONST), (int) (edge.to.y * SCALING_CONST+OFFSET_CONST));
+      }
+    }
+  }
+
   private void drawVoronoiCentroids(Graphics2D g2d) {
     for (var cell : lloydStep.voronoiCells) {
       var centroid = cell.getCentroid();

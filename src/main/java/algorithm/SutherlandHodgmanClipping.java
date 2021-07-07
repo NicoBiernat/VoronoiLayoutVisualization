@@ -11,21 +11,21 @@ import java.util.function.Predicate;
  */
 public class SutherlandHodgmanClipping {
 
-    public static void clip(LloydStep.EdgeArc polygon, double x, double y, double width, double height) {
-        List<LloydStep.Node> nodes = polygon.getNodesInOrder();
-        List<LloydStep.Node> resultList = new ArrayList<>();
+    public static void clip(EdgeArc polygon, double x, double y, double width, double height) {
+        List<Node> nodes = polygon.getNodesInOrder();
+        List<Node> resultList = new ArrayList<>();
 
-        Predicate<LloydStep.Node> insideTop = n -> n.y >= y;
-        Predicate<LloydStep.Node> outsideTop = n -> n.y < y;
+        Predicate<Node> insideTop = n -> n.y >= y;
+        Predicate<Node> outsideTop = n -> n.y < y;
 
-        Predicate<LloydStep.Node> insideRight = n -> n.x <= x + width;
-        Predicate<LloydStep.Node> outsideRight = n -> n.x > x + width;
+        Predicate<Node> insideRight = n -> n.x <= x + width;
+        Predicate<Node> outsideRight = n -> n.x > x + width;
 
-        Predicate<LloydStep.Node> insideBottom = n -> n.y <= y + height;
-        Predicate<LloydStep.Node> outsideBottom = n -> n.y > y + height;
+        Predicate<Node> insideBottom = n -> n.y <= y + height;
+        Predicate<Node> outsideBottom = n -> n.y > y + height;
 
-        Predicate<LloydStep.Node> insideLeft = n -> n.x >= x;
-        Predicate<LloydStep.Node> outsideLeft = n -> n.x < x;
+        Predicate<Node> insideLeft = n -> n.x >= x;
+        Predicate<Node> outsideLeft = n -> n.x < x;
 
         clipSide(nodes, resultList, insideTop, outsideTop, ClippingDirection.HORIZONTAL, y);
         nodes = resultList;
@@ -38,9 +38,9 @@ public class SutherlandHodgmanClipping {
         resultList = new ArrayList<>();
         clipSide(nodes, resultList, insideLeft, outsideLeft, ClippingDirection.VERTICAL, x);
 
-        List<LloydStep.Edge> newEdges = new ArrayList<>();
+        List<Edge> newEdges = new ArrayList<>();
         for (int i = 0; i < resultList.size(); i++) {
-            newEdges.add(new LloydStep.Edge(resultList.get(i), resultList.get((i+1) % resultList.size())));
+            newEdges.add(new Edge(resultList.get(i), resultList.get((i+1) % resultList.size())));
         }
         polygon.edges = newEdges;
     }
@@ -50,9 +50,9 @@ public class SutherlandHodgmanClipping {
         VERTICAL
     }
 
-    private static void clipSide(List<LloydStep.Node> nodes, List<LloydStep.Node> resultList,
-                                 Predicate<LloydStep.Node> inside, Predicate<LloydStep.Node> outside,
-                                 ClippingDirection clippingDirection,  double clippingEdgePos) {
+    private static void clipSide(List<Node> nodes, List<Node> resultList,
+                                 Predicate<Node> inside, Predicate<Node> outside,
+                                 ClippingDirection clippingDirection, double clippingEdgePos) {
         for (int i = 0; i < nodes.size(); i++) {
             var from = nodes.get(i);
             var to = nodes.get((i+1) % nodes.size());
@@ -63,20 +63,20 @@ public class SutherlandHodgmanClipping {
                 double intersectionPos = calculateIntersection(clippingDirection, clippingEdgePos, from, to);
                 switch (clippingDirection) {
                     case HORIZONTAL:
-                        resultList.add(new LloydStep.Node("S(" + from.id + "," + to.id + ")", intersectionPos, clippingEdgePos));
+                        resultList.add(new Node("S(" + from.id + "," + to.id + ")", intersectionPos, clippingEdgePos));
                         break;
                     case VERTICAL:
-                        resultList.add(new LloydStep.Node("S(" + from.id + "," + to.id + ")", clippingEdgePos, intersectionPos));
+                        resultList.add(new Node("S(" + from.id + "," + to.id + ")", clippingEdgePos, intersectionPos));
                         break;
                 }
             } else if (outside.test(from) && inside.test(to)) { // "from" outside, "to" inside
                 double intersectionPos = calculateIntersection(clippingDirection, clippingEdgePos, from, to);
                 switch (clippingDirection) {
                     case HORIZONTAL:
-                        resultList.add(new LloydStep.Node("S(" + from.id + "," + to.id + ")", intersectionPos, clippingEdgePos));
+                        resultList.add(new Node("S(" + from.id + "," + to.id + ")", intersectionPos, clippingEdgePos));
                         break;
                     case VERTICAL:
-                        resultList.add(new LloydStep.Node("S(" + from.id + "," + to.id + ")", clippingEdgePos, intersectionPos));
+                        resultList.add(new Node("S(" + from.id + "," + to.id + ")", clippingEdgePos, intersectionPos));
                         break;
                 }
                 resultList.add(to);
@@ -84,7 +84,7 @@ public class SutherlandHodgmanClipping {
         }
     }
 
-    private static double calculateIntersection(ClippingDirection clippingDirection, double fixedCoord, LloydStep.Node from, LloydStep.Node to) {
+    private static double calculateIntersection(ClippingDirection clippingDirection, double fixedCoord, Node from, Node to) {
         if ((to.x - from.x) == 0) { // infinite slope
             if (clippingDirection.equals(ClippingDirection.HORIZONTAL)) {
                 return from.x;
@@ -138,27 +138,27 @@ public class SutherlandHodgmanClipping {
         private final double y = 100;
         private final double width = 500;
         private final double height = 500;
-        private final LloydStep.EdgeArc unclipped;
-        private final LloydStep.EdgeArc clipped;
+        private final EdgeArc unclipped;
+        private final EdgeArc clipped;
 
-        private final LloydStep.Node[] nodes = {
-                new LloydStep.Node("n1", 120, 120),
-                new LloydStep.Node("n2", 160, 80),
-                new LloydStep.Node("n3", 650, 300),
-                new LloydStep.Node("n4", 300, 650),
-                new LloydStep.Node("n5", 80, 300),
+        private final Node[] nodes = {
+                new Node("n1", 120, 120),
+                new Node("n2", 160, 80),
+                new Node("n3", 650, 300),
+                new Node("n4", 300, 650),
+                new Node("n5", 80, 300),
         };
 
         public TestCanvas() {
-            List<LloydStep.Edge> edges = new ArrayList<>();
+            List<Edge> edges = new ArrayList<>();
             for (int i = 0; i < nodes.length; i++) {
-                edges.add(new LloydStep.Edge(nodes[i], nodes[(i+1) % nodes.length]));
+                edges.add(new Edge(nodes[i], nodes[(i+1) % nodes.length]));
             }
-            List<LloydStep.Edge> edgesCopy = new ArrayList<>(edges);
+            List<Edge> edgesCopy = new ArrayList<>(edges);
 
-            unclipped = new LloydStep.EdgeArc();
+            unclipped = new EdgeArc();
             unclipped.edges = edgesCopy;
-            clipped = new LloydStep.EdgeArc();
+            clipped = new EdgeArc();
             clipped.edges = edges;
 
             SutherlandHodgmanClipping.clip(clipped, x, y, width, height);
@@ -191,13 +191,13 @@ public class SutherlandHodgmanClipping {
             draw(g2d, nodes);
         }
 
-        private void draw(Graphics2D g2d, LloydStep.EdgeArc edgeArc) {
+        private void draw(Graphics2D g2d, EdgeArc edgeArc) {
             for (var edge : edgeArc.edges) {
                 g2d.drawLine((int) edge.from.x, (int) edge.from.y, (int) edge.to.x, (int) edge.to.y);
             }
         }
 
-        private void draw(Graphics2D g2d, LloydStep.Node[] nodes) {
+        private void draw(Graphics2D g2d, Node[] nodes) {
             for (var node : nodes) {
                 drawOval(Color.BLACK, node.x, node.y, 5, g2d);
                 g2d.drawString(node.id, (int) node.x, (int) node.y);

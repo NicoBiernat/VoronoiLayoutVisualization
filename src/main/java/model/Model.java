@@ -1,5 +1,6 @@
 package model;
 
+import algorithm.Graph;
 import algorithm.LloydRelaxation;
 import algorithm.LloydStep;
 import org.eclipse.elk.alg.force.options.ForceMetaDataProvider;
@@ -22,7 +23,7 @@ public class Model {
   private File selectedFile;
 
   private List<LloydStep> lloydSteps;
-  private LloydStep.Graph inputGraph;
+  private Graph inputGraph;
 
   private int index = -1;
   private int substepIndex = 0;
@@ -33,7 +34,7 @@ public class Model {
     return selectedFile;
   }
 
-  private Model(List<LloydStep> lloydSteps, LloydStep.Graph inputGraph) {
+  private Model(List<LloydStep> lloydSteps, Graph inputGraph) {
     this.lloydSteps = lloydSteps;
     this.inputGraph = inputGraph;
   }
@@ -196,7 +197,7 @@ public class Model {
     return lloydSteps.get(index);
   }
 
-  public LloydStep.Graph getInputGraph() {
+  public Graph getInputGraph() {
     return inputGraph;
   }
 
